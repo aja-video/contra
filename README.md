@@ -49,8 +49,10 @@ If a password, or any field in the config file, contains a `#` or `;` character 
 quote the password with either a backtick ``` ` ``` or a set of three double-quotes ``` """ ``` for
 example, if your password is `Some#pass;word` you will need one of the following formats:
 
-    Pass=`Some#pass;word`
-    Pass="""Some#pass;word"""
+```
+Pass=`Some#pass;word`
+Pass="""Some#pass;word"""
+```
 
 ## License
 

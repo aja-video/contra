@@ -1,0 +1,9 @@
+# Binaries, builds and vendor folders.
+bin/
+vendor/
+
+# Config file
+devices.conf
+
+# Local GIT workspace
+workspace/
