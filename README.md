@@ -14,11 +14,10 @@ network device configurations.
 
 ```
 git clone gitlab.aja.com/go/contra
-dep ensure
-make run
+make first
 ```
 
-Alternatively, simply run `make` then execute `./bin/contra`
+After the initial build, `make run` or `make` then execute `./bin/contra` will work.
 
 ## Dependency Management
 
