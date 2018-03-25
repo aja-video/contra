@@ -12,6 +12,7 @@ func main() {
 
 	// Print something from an imported package.
 	collectors.Collect()
+	collectors.CollectComware()
 
 	// Pull a result from an ini using a third party package
 	str := utils.ExampleIni()
