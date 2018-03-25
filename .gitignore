@@ -7,3 +7,6 @@ devices.conf
 
 # Local GIT workspace
 workspace/
+
+# IDE cruft
+.idea/

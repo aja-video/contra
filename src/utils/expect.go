@@ -2,23 +2,27 @@ package utils
 
 import (
 	"github.com/google/goexpect"
-	"regexp"
 	"time"
+	//	"regexp"
+	"golang.org/x/crypto/ssh"
 )
 
+func GatherExpect(batcher *[]expect.Batcher, timeout time.Duration, ssh *ssh.Client) ([]expect.BatchRes, error) {
 
-func Expect(cmd string, timeout time.Duration, target string) (string, []string, error){
-	// spawn our command
-	ex, _, err := expect.Spawn(cmd, timeout)
-	if err != nil {
-		panic(err)
-	}
-	// parse output
-	out, match, err := ex.Expect(regexp.MustCompile(target), timeout)
+	// attach expect to our SSH connection
+	ex, _, err := expect.SpawnSSH(ssh, timeout)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return out, match, err
+	// Gather data - batcher defined inside collector
+	gather, err := ex.ExpectBatch(*batcher, timeout)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// return config data
+	return gather, err
 }
