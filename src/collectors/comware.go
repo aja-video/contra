@@ -8,7 +8,7 @@ import (
 )
 
 func CollectComware() string {
-    fmt.Printf("Collect Works\n")
+    fmt.Printf("Collect Works - Comware\n")
 
     // set up ssh connection - obviously not the right place for this
     connection, err := utils.SshClient("changeme", "thisshouldn'tbehere", "10.0.0.2:22")
