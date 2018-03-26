@@ -9,7 +9,7 @@ import (
 )
 
 // GatherExpect initializes expect with our SSH connection and gathers results of the batch.
-func GatherExpect(batcher *[]expect.Batcher, timeout time.Duration, ssh *ssh.Client) ([]expect.BatchRes, error) {
+func GatherExpect(batcher []expect.Batcher, timeout time.Duration, ssh *ssh.Client) ([]expect.BatchRes, error) {
 
 	// attach expect to our SSH connection
 	ex, _, err := expect.SpawnSSH(ssh, timeout)
@@ -19,7 +19,7 @@ func GatherExpect(batcher *[]expect.Batcher, timeout time.Duration, ssh *ssh.Cli
 	}
 
 	// Gather data - batcher defined inside collector
-	gather, err := ex.ExpectBatch(*batcher, timeout)
+	gather, err := ex.ExpectBatch(batcher, timeout)
 
 	if err != nil {
 		panic(err)
@@ -30,7 +30,7 @@ func GatherExpect(batcher *[]expect.Batcher, timeout time.Duration, ssh *ssh.Cli
 }
 
 // BuildBatcher builds expect.Batcher from a send and receive map
-func BuildBatcher(send map[int]string, receive map[int]string) *[]expect.Batcher {
+func BuildBatcher(send map[int]string, receive map[int]string) []expect.Batcher {
 
 	// Initialize stuff
 	keys := make([]int, 0)
@@ -57,7 +57,7 @@ func BuildBatcher(send map[int]string, receive map[int]string) *[]expect.Batcher
 	}
 
 	// return
-	return &batch
+	return batch
 }
 
 // SimpleBatcher implements a straight forward send/receive pattern.

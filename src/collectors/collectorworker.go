@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-// TODO: Probably rename this to collector, and rename collector to CollectorDefinition
-
 // CollectorWorker write me.
 type CollectorWorker struct {
 	RunConfig *configuration.Config
@@ -18,7 +16,6 @@ type CollectorWorker struct {
 
 // RunCollectors runs all collectors
 func (cw *CollectorWorker) RunCollectors() {
-	//collectorSlice := GenerateCollectorsFromConfig(cw.RunConfig)
 	for _, device := range cw.RunConfig.Devices {
 		if device.Disabled {
 			log.Printf("Config disabled: %v", device.Name)
@@ -31,19 +28,13 @@ func (cw *CollectorWorker) RunCollectors() {
 	fmt.Printf("Completed collections: %d\n", len(cw.RunConfig.Devices))
 }
 
-// Run write me.
+// Run the collector for this device.
 func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 	fmt.Printf("Collect Start: %s\n", device.Name)
 
 	collector, _ := MakeCollector(device)
 
 	batchSlice, _ := collector.BuildBatcher()
-
-	log.Print(batchSlice)
-
-	// call GatherExpect to collect the configs
-	// set up ssh connection - obviously not the right place for this
-	//creds := FetchConfig("pfsense")
 
 	// Set up SSHConfig
 	s := &utils.SSHConfig{
@@ -59,18 +50,18 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 
 	connection, err := utils.SSHClient(*s)
 
-	result, err := utils.GatherExpect(&batchSlice, time.Second*10, connection)
+	// call GatherExpect to collect the configs
+	// TODO: Verify pointer/reference/dereference is necessary.
+	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
 	if err != nil {
 		panic(err)
 	}
 
-	// DONE: Grab just the last result.
-	// result[2].Output
+	// Grab just the last result.
 	lastResult := result[len(result)-1].Output
 	parsed, _ := collector.ParseResult(lastResult)
 
-	// match[0]
-	log.Printf("Writing: %s\n%d\n", device.Name, len(parsed))
+	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
 	utils.WriteFile(parsed, device.Name+".txt")
 }

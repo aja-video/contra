@@ -29,13 +29,12 @@ func (p *devCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
 	})
 }
 
-// ParseResult write me.
+// ParseResult for CiscoCSB
 func (p *devCiscoCsb) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
 	// This may break if there is a '#' in the config
-	searchx := regexp.MustCompile(`config-file-header[\s\S]*?#`)
-
-	match := searchx.FindStringSubmatch(result)
+	matcher := regexp.MustCompile(`config-file-header[\s\S]*?#`)
+	match := matcher.FindStringSubmatch(result)
 
 	return match[0], nil
 }

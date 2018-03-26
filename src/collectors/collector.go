@@ -18,12 +18,6 @@ type CollectorSpecial interface {
 	ModifySSHConfig(config *utils.SSHConfig)
 }
 
-// CollectorDefinition write me.
-type CollectorDefinition struct {
-	name        string
-	LocalConfig configuration.DeviceConfig
-}
-
 // MakeCollector will generate the appropriate collector based on the
 // type string passed in by the configuration.
 func MakeCollector(d configuration.DeviceConfig) (Collector, error) {
