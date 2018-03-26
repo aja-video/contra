@@ -11,9 +11,10 @@ func main() {
 	fmt.Printf("Contra\n")
 
 	// Run sample collectors.
-	collectors.Collect()
-	collectors.CollectComware()
-	collectors.CollectProcurve()
+	//collectors.Collect()
+	//collectors.CollectComware()
+	//collectors.CollectProcurve()
+	collectors.CollectCsb()
 	// Pull a result from an ini using a third party package
 	str := utils.ExampleIni()
 	fmt.Printf("Found: %v\n", str)

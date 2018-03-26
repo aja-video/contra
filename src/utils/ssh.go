@@ -5,15 +5,36 @@ import (
 	"time"
 )
 
-// SSHClient dials up our target device.
-func SSHClient(user string, password string, host string) (*ssh.Client, error) {
+//SSHConfig type to map SSH Configs
+type SSHConfig struct {
+	User     string
+	Password string
+	Host     string
+	Ciphers  []string
+}
 
-	client, err := ssh.Dial("tcp", host, &ssh.ClientConfig{
-		User:            user,
-		Auth:            []ssh.AuthMethod{ssh.Password(password)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Timeout:         time.Second * 10,
-	})
+// SSHClient dials up our target device.
+func SSHClient(c SSHConfig) (*ssh.Client, error) {
+	config := &ssh.ClientConfig{
+		User:            c.User,
+		Auth:            []ssh.AuthMethod{ssh.Password(c.Password)},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: this should be an option
+		Timeout:         time.Second * 10,            //TODO: this should be an option
+	}
+	if c.Ciphers != nil {
+		config.Config = ssh.Config{
+			Ciphers: c.Ciphers,
+		}
+
+	}
+	//client, err := ssh.Dial("tcp", host, &ssh.ClientConfig{
+	//	User:            user,
+	//		Auth:            []ssh.AuthMethod{ssh.Password(password)},
+	//		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	//		Timeout:         time.Second * 10,
+	//	})
+
+	client, err := ssh.Dial("tcp", c.Host, config)
 
 	if err != nil {
 		panic(err)

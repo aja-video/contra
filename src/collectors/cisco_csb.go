@@ -7,35 +7,39 @@ import (
 	"time"
 )
 
-// CollectComware pulls the device config for a comware device.
-func CollectComware() string {
-	fmt.Printf("Collect Works - Comware\n")
+// CollectCsb pulls the device config for a Cisco Small Business device.
+func CollectCsb() string {
+	fmt.Printf("Collect Works - Cisco_csb\n")
 
 	// set up ssh connection
 	s := new(utils.SSHConfig)
 
-	creds := utils.FetchConfig("comware")
+	creds := utils.FetchConfig("csb")
 	// Set up SSHConfig
 	s.User = creds["user"]
 	s.Password = creds["pass"]
 	s.Host = creds["host"] + ":" + creds["port"]
+	s.Ciphers = []string{"aes256-cbc", "aes128-cbc"}
 
 	connection, err := utils.SSHClient(*s)
+
 	if err != nil {
 		panic(err)
 	}
 
 	// Output we expect to receive
 	receive := map[int]string{
-		1: "<.*.>", // 1 : should always match the initial connection string
-		2: "<.*.>",
-		3: "return",
+		1: "Name:", // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
+		2: ".*#",
+		3: ".*#",
+		4: ".*#",
 	}
 
 	// Commands we will send in response to output above
 	send := map[int]string{
-		1: "screen-length disable\n",
-		2: "display current-configuration\n",
+		1: creds["user"] + "\n",
+		2: "terminal datadump\n",
+		3: "show running-config",
 	}
 
 	// Build batcher
@@ -48,10 +52,11 @@ func CollectComware() string {
 	}
 
 	// Strip shell commands, grab only the xml file
-	config := regexp.MustCompile(`#[\s\S]*?return`)
+	config := regexp.MustCompile(`config-file-header[\s\S]*?#`) // This may break if there is a '#' in the config
 
-	match := config.FindStringSubmatch(result[2].Output)
+	match := config.FindStringSubmatch(result[3].Output)
 
-	utils.WriteFile(match[0], "comware.txt")
+	//utils.WriteFile(match[0], "cisco_csb.txt")
+	fmt.Printf(match[0])
 	return match[0]
 }
