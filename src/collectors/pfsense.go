@@ -7,13 +7,20 @@ import (
 	"time"
 )
 
-// Collect currently collects a pfSense config.
-func Collect() string {
+// CollectpfSense collects a pfSense config.
+func CollectpfSense() string {
 	fmt.Printf("Collect Works - pfSense\n")
 
-	// set up ssh connection - obviously not the right place for this
+	// set up ssh connection
+	s := new(utils.SSHConfig)
+
 	creds := utils.FetchConfig("pfsense")
-	connection, err := utils.SSHClient(creds["user"], creds["pass"], creds["host"]+":"+creds["port"])
+	// Set up SSHConfig
+	s.User = creds["user"]
+	s.Password = creds["pass"]
+	s.Host = creds["host"] + ":" + creds["port"]
+
+	connection, err := utils.SSHClient(*s)
 
 	if err != nil {
 		panic(err)
