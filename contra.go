@@ -18,4 +18,5 @@ func main() {
 	str := utils.ExampleIni()
 	fmt.Printf("Found: %v\n", str)
 
+	utils.Commit()
 }
