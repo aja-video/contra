@@ -12,7 +12,8 @@ func Collect() string {
 	fmt.Printf("Collect Works - pfSense\n")
 
 	// set up ssh connection - obviously not the right place for this
-	connection, err := utils.SSHClient("admin", "thisshouldn'tbehere!", "192.168.1.1:22")
+	creds := utils.FetchConfig("pfsense")
+	connection, err := utils.SSHClient(creds["user"], creds["pass"], creds["host"]+":"+creds["port"])
 
 	if err != nil {
 		panic(err)

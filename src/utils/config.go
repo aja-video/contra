@@ -18,3 +18,16 @@ func ExampleIni() string {
 	// [neat]  result = awesome
 	return iniFile.Section("neat").Key("result").String()
 }
+
+// FetchConfig is a quick function to pull a config during development.
+func FetchConfig(target string) map[string]string {
+	iniFile, err := ini.Load("devices.conf")
+
+	if err != nil {
+		// Critical...
+		log.Println("example.conf")
+		panic(err)
+	}
+
+	return iniFile.Section(target).KeysHash()
+}
