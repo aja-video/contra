@@ -27,12 +27,6 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 		}
 
 	}
-	//client, err := ssh.Dial("tcp", host, &ssh.ClientConfig{
-	//	User:            user,
-	//		Auth:            []ssh.AuthMethod{ssh.Password(password)},
-	//		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	//		Timeout:         time.Second * 10,
-	//	})
 
 	client, err := ssh.Dial("tcp", c.Host, config)
 
