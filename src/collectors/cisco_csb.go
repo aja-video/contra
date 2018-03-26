@@ -29,17 +29,19 @@ func CollectCsb() string {
 
 	// Output we expect to receive
 	receive := map[int]string{
-		1: "Name:", // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
-		2: ".*#",
+		1: "User Name:", // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
+		2: "Password:",
 		3: ".*#",
 		4: ".*#",
+		5: ".*#",
 	}
 
 	// Commands we will send in response to output above
 	send := map[int]string{
 		1: creds["user"] + "\n",
-		2: "terminal datadump\n",
-		3: "show running-config",
+		2: creds["pass"] + "\n",
+		3: "terminal datadump\n",
+		4: "show running-config\n",
 	}
 
 	// Build batcher
@@ -51,12 +53,13 @@ func CollectCsb() string {
 		panic(err)
 	}
 
+	fmt.Print(len(result))
 	// Strip shell commands, grab only the xml file
 	config := regexp.MustCompile(`config-file-header[\s\S]*?#`) // This may break if there is a '#' in the config
 
-	match := config.FindStringSubmatch(result[3].Output)
+	match := config.FindStringSubmatch(result[len(result)-1].Output)
 
-	//utils.WriteFile(match[0], "cisco_csb.txt")
+	utils.WriteFile(match[0], "cisco_csb.txt")
 	fmt.Printf(match[0])
 	return match[0]
 }
