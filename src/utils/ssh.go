@@ -5,9 +5,8 @@ import (
 	"time"
 )
 
-// sshClient
-
-func SshClient(user string, password string, host string) (*ssh.Client, error) {
+// SSHClient dials up our target device.
+func SSHClient(user string, password string, host string) (*ssh.Client, error) {
 
 	client, err := ssh.Dial("tcp", host, &ssh.ClientConfig{
 		User:            user,
@@ -21,5 +20,4 @@ func SshClient(user string, password string, host string) (*ssh.Client, error) {
 	}
 
 	return client, err
-
 }

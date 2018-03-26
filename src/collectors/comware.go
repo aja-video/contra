@@ -7,11 +7,12 @@ import (
 	"time"
 )
 
+// CollectComware pulls the device config for a comware device.
 func CollectComware() string {
 	fmt.Printf("Collect Works - Comware\n")
 
 	// set up ssh connection - obviously not the right place for this
-	connection, err := utils.SshClient("changeme", "thisshouldn'tbehere", "10.0.0.2:22")
+	connection, err := utils.SSHClient("changeme", "thisshouldn'tbehere", "10.0.0.2:22")
 
 	if err != nil {
 		panic(err)

@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// ExampleIni is a proof of concept for pulling ini values.
 func ExampleIni() string {
 	iniFile, err := ini.Load("example.conf")
 

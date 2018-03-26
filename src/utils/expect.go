@@ -8,6 +8,7 @@ import (
 	"sort"
 )
 
+// GatherExpect initializes expect with our SSH connection and gathers results of the batch.
 func GatherExpect(batcher *[]expect.Batcher, timeout time.Duration, ssh *ssh.Client) ([]expect.BatchRes, error) {
 
 	// attach expect to our SSH connection

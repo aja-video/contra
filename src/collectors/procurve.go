@@ -7,11 +7,12 @@ import (
 	"time"
 )
 
+// CollectProcurve does exactly what it sounds like it does.
 func CollectProcurve() string {
 	fmt.Printf("Collect Works - Procurve\n")
 
 	// set up ssh connection - obviously not the right place for this
-	connection, err := utils.SshClient("changeme", "wrongplace", "10.0.0.0:22")
+	connection, err := utils.SSHClient("changeme", "wrongplace", "10.0.0.0:22")
 
 	if err != nil {
 		panic(err)
