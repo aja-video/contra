@@ -14,7 +14,7 @@ func CollectComware() string {
 	// set up ssh connection
 	s := new(utils.SSHConfig)
 
-	creds := utils.FetchConfig("comware")
+	creds := FetchConfig("comware")
 	// Set up SSHConfig
 	s.User = creds["user"]
 	s.Password = creds["pass"]

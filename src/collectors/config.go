@@ -1,9 +1,11 @@
-package utils
+package collectors
 
 import (
 	"github.com/go-ini/ini"
 	"log"
 )
+
+// Cyclical import cycle if config is not in collectors...
 
 // ExampleIni is a proof of concept for pulling ini values.
 func ExampleIni() string {
@@ -17,6 +19,24 @@ func ExampleIni() string {
 
 	// [neat]  result = awesome
 	return iniFile.Section("neat").Key("result").String()
+}
+
+// GenerateCollectorsFromConfig is neat
+func GenerateCollectorsFromConfig() []Collector {
+	// which := []string{"pfsense"}
+	//collector := &DevicePfsense{}
+
+	collectorSlice := []Collector{
+		&DevicePfsense{},
+	}
+
+	// Run sample collectors.
+	//CollectpfSense()
+	//CollectComware()
+	//CollectProcurve()
+	//CollectCsb()
+
+	return collectorSlice
 }
 
 // FetchConfig is a quick function to pull a config during development.

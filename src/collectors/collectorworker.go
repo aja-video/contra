@@ -25,8 +25,22 @@ func (cw *CollectorWorker) Run(collector Collector) {
 
 	// call GatherExpect to collect the configs
 	// set up ssh connection - obviously not the right place for this
-	creds := utils.FetchConfig("pfsense")
-	connection, _ := utils.SSHClient(creds["user"], creds["pass"], creds["host"]+":"+creds["port"])
+	creds := FetchConfig("pfsense")
+
+	// set up ssh connection
+	s := new(utils.SSHConfig)
+	// Set up SSHConfig
+	s.User = creds["user"]
+	s.Password = creds["pass"]
+	s.Host = creds["host"] + ":" + creds["port"]
+
+	// Special case... only some collectors need to make some modifications.
+	if collectorSpecial, ok := collector.(CollectorSpecial); ok {
+		collectorSpecial.ModifySSHConfig(*s)
+	}
+
+	connection, err := utils.SSHClient(*s)
+
 	result, err := utils.GatherExpect(&batchSlice, time.Second*10, connection)
 	if err != nil {
 		panic(err)
@@ -38,7 +52,7 @@ func (cw *CollectorWorker) Run(collector Collector) {
 
 	// result[2].Output
 	// match[0]
-	log.Printf("Writing: %s\n%s\n", which, parsed)
+	log.Printf("Writing: %s\n%d\n", which, len(parsed))
 
 	utils.WriteFile(parsed, which+".txt")
 }

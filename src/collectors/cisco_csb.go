@@ -14,7 +14,7 @@ func CollectCsb() string {
 	// set up ssh connection
 	s := new(utils.SSHConfig)
 
-	creds := utils.FetchConfig("csb")
+	creds := FetchConfig("csb")
 	// Set up SSHConfig
 	s.User = creds["user"]
 	s.Password = creds["pass"]

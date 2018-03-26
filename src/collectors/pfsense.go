@@ -4,6 +4,7 @@ import (
 	"contra/src/utils"
 	"fmt"
 	"github.com/google/goexpect"
+	"log"
 	"regexp"
 	"time"
 )
@@ -36,6 +37,11 @@ func (p *DevicePfsense) ParseResult(result string) (string, error) {
 	return match[0], nil
 }
 
+// ModifySSHConfig just temp.
+func (p *DevicePfsense) ModifySSHConfig(config utils.SSHConfig) {
+	log.Println("Super speshal.")
+}
+
 // CollectpfSense collects a pfSense config.
 func CollectpfSense() string {
 	fmt.Printf("Collect Works - pfSense\n")
@@ -43,7 +49,7 @@ func CollectpfSense() string {
 	// set up ssh connection
 	s := new(utils.SSHConfig)
 
-	creds := utils.FetchConfig("pfsense")
+	creds := FetchConfig("pfsense")
 	// Set up SSHConfig
 	s.User = creds["user"]
 	s.Password = creds["pass"]
