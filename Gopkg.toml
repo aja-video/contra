@@ -32,3 +32,8 @@
 [[constraint]]
   name = "github.com/go-ini/ini"
   version = "1.33.0"
+
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/google/goexpect"

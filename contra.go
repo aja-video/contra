@@ -10,10 +10,12 @@ func main() {
 	// Print something.
 	fmt.Printf("Contra\n")
 
-	// Print something from an imported package.
+	// Run sample collectors.
 	collectors.Collect()
-
+	collectors.CollectComware()
+	collectors.CollectProcurve()
 	// Pull a result from an ini using a third party package
 	str := utils.ExampleIni()
 	fmt.Printf("Found: %v\n", str)
+
 }

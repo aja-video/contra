@@ -7,9 +7,46 @@
   revision = "6333e38ac20b8949a8dd68baa3650f4dee8f39f0"
   version = "v1.33.0"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/glog"
+  packages = ["."]
+  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/google/goexpect"
+  packages = ["."]
+  revision = "756071476d4175eed2d146a607574a92063d1f58"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/google/goterm"
+  packages = ["term"]
+  revision = "a4092ec6825782fa1703cbaaeaf24ef377d5c9c4"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "curve25519",
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "internal/chacha20",
+    "poly1305",
+    "ssh"
+  ]
+  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
+
+[[projects]]
+  name = "google.golang.org/grpc"
+  packages = ["codes"]
+  revision = "8e4536a86ab602859c20df5ebfd0bd4228d08655"
+  version = "v1.10.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2a1a840e06e6ade0dd5c6ac1c7892ca9d33dac513f6c4716b5c26bfa3a4930cd"
+  inputs-digest = "2006dc2eb6a8df47f752c5d407b4e511ccadef0a4e8671beb8b545eafd07f699"
   solver-name = "gps-cdcl"
   solver-version = 1

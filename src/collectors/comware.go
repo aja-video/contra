@@ -7,13 +7,12 @@ import (
 	"time"
 )
 
-// Collect currently collects a pfSense config.
-func Collect() string {
-	fmt.Printf("Collect Works - pfSense\n")
+// CollectComware pulls the device config for a comware device.
+func CollectComware() string {
+	fmt.Printf("Collect Works - Comware\n")
 
 	// set up ssh connection - obviously not the right place for this
-	creds := utils.FetchConfig("pfsense")
-	connection, err := utils.SSHClient(creds["user"], creds["pass"], creds["host"]+":"+creds["port"])
+	connection, err := utils.SSHClient("changeme", "thisshouldn'tbehere", "10.0.0.2:22")
 
 	if err != nil {
 		panic(err)
@@ -21,15 +20,15 @@ func Collect() string {
 
 	// Output we expect to receive
 	receive := map[int]string{
-		1: "option:", // 1 : should always match the initial connection string
-		2: ".*root",
-		3: "</pfsense>",
+		1: "<.*.>", // 1 : should always match the initial connection string
+		2: "<.*.>",
+		3: "return",
 	}
 
 	// Commands we will send in response to output above
 	send := map[int]string{
-		1: "8\n",
-		2: "cat /conf/config.xml\n",
+		1: "screen-length disable\n",
+		2: "display current-configuration\n",
 	}
 
 	// Build batcher
@@ -42,10 +41,10 @@ func Collect() string {
 	}
 
 	// Strip shell commands, grab only the xml file
-	config := regexp.MustCompile(`<\?xml version[\s\S]*?<\/pfsense>`)
+	config := regexp.MustCompile(`#[\s\S]*?return`)
 
 	match := config.FindStringSubmatch(result[2].Output)
 
-	utils.WriteFile(match[0], "pfsense.txt")
+	utils.WriteFile(match[0], "comware.txt")
 	return match[0]
 }
