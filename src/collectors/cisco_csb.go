@@ -7,18 +7,19 @@ import (
 	"time"
 )
 
-// CollectProcurve does exactly what it sounds like it does.
-func CollectProcurve() string {
-	fmt.Printf("Collect Works - Procurve\n")
+// CollectCsb pulls the device config for a Cisco Small Business device.
+func CollectCsb() string {
+	fmt.Printf("Collect Works - Cisco_csb\n")
 
 	// set up ssh connection
 	s := new(utils.SSHConfig)
 
-	creds := utils.FetchConfig("procurve")
+	creds := utils.FetchConfig("csb")
 	// Set up SSHConfig
 	s.User = creds["user"]
 	s.Password = creds["pass"]
 	s.Host = creds["host"] + ":" + creds["port"]
+	s.Ciphers = []string{"aes256-cbc", "aes128-cbc"}
 
 	connection, err := utils.SSHClient(*s)
 
@@ -28,17 +29,19 @@ func CollectProcurve() string {
 
 	// Output we expect to receive
 	receive := map[int]string{
-		1: "continue", // 1 : should always match the initial connection string
-		2: ".*#",
+		1: "User Name:", // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
+		2: "Password:",
 		3: ".*#",
 		4: ".*#",
+		5: ".*#",
 	}
 
 	// Commands we will send in response to output above
 	send := map[int]string{
-		1: "a\n",
-		2: "no page\n",
-		3: "show running-config\n",
+		1: creds["user"] + "\n",
+		2: creds["pass"] + "\n",
+		3: "terminal datadump\n",
+		4: "show running-config\n",
 	}
 
 	// Build batcher
@@ -50,13 +53,13 @@ func CollectProcurve() string {
 		panic(err)
 	}
 
+	fmt.Print(len(result))
 	// Strip shell commands, grab only the xml file
-	// this regex assumes all procurve configs begin with 'hostname', and end with 'password manager'
-	// Should probably find a better match...
-	config := regexp.MustCompile(`hostname[\s\S]*?manager`)
-	// search the last element of result for the regex above
-	match := config.FindStringSubmatch(result[3].Output)
+	config := regexp.MustCompile(`config-file-header[\s\S]*?#`) // This may break if there is a '#' in the config
 
-	utils.WriteFile(match[0], "procurve.txt")
+	match := config.FindStringSubmatch(result[len(result)-1].Output)
+
+	utils.WriteFile(match[0], "cisco_csb.txt")
+	fmt.Printf(match[0])
 	return match[0]
 }

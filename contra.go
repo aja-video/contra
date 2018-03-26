@@ -19,9 +19,10 @@ func main() {
 	}
 
 	// Run sample collectors.
-	collectors.Collect()
+	collectors.CollectpfSense()
 	collectors.CollectComware()
 	collectors.CollectProcurve()
+	collectors.CollectCsb()
 
 	// Pull a result from an ini using a third party package
 	str := utils.ExampleIni()
