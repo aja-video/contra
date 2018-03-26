@@ -19,24 +19,19 @@ func Collect() string {
 		panic(err)
 	}
 
-	// Output we expect to receive
-	receive := map[int]string{
-		1: "option:", // 1 : should always match the initial connection string
-		2: ".*root",
-		3: "</pfsense>",
-	}
+	batch, err := utils.SimpleBatcher([][]string{
+		{"option:", "8\n"}, // "option:" should always match the initial connection string
+		{".*root", "cat /conf/config.xml\n"},
+		{"</pfsense>"},
+	})
 
-	// Commands we will send in response to output above
-	send := map[int]string{
-		1: "8\n",
-		2: "cat /conf/config.xml\n",
+	if err != nil {
+		panic(err)
 	}
-
-	// Build batcher
-	batch := utils.BuildBatcher(send, receive)
 
 	// call GatherExpect to collect the configs
-	result, err := utils.GatherExpect(batch, time.Second*10, connection)
+	// TODO: Verify pointer/reference/dereference is necessary.
+	result, err := utils.GatherExpect(&batch, time.Second*10, connection)
 	if err != nil {
 		panic(err)
 	}
