@@ -1,9 +1,11 @@
 package collectors
 
 import (
+	"contra/src/configuration"
 	"contra/src/utils"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -11,13 +13,29 @@ import (
 
 // CollectorWorker write me.
 type CollectorWorker struct {
+	RunConfig *configuration.Config
+}
+
+// RunCollectors runs all collectors
+func (cw *CollectorWorker) RunCollectors() {
+	//collectorSlice := GenerateCollectorsFromConfig(cw.RunConfig)
+	for _, device := range cw.RunConfig.Devices {
+		if device.Disabled {
+			log.Printf("Config disabled: %v", device.Name)
+			continue
+		}
+
+		cw.Run(device)
+	}
+
+	fmt.Printf("Completed collections: %d\n", len(cw.RunConfig.Devices))
 }
 
 // Run write me.
-func (cw *CollectorWorker) Run(collector Collector) {
-	which := "pfsense"
+func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
+	fmt.Printf("Collect Start: %s\n", device.Name)
 
-	fmt.Printf("Collect Works - pfSense\n")
+	collector, _ := MakeCollector(device)
 
 	batchSlice, _ := collector.BuildBatcher()
 
@@ -25,18 +43,18 @@ func (cw *CollectorWorker) Run(collector Collector) {
 
 	// call GatherExpect to collect the configs
 	// set up ssh connection - obviously not the right place for this
-	creds := FetchConfig("pfsense")
+	//creds := FetchConfig("pfsense")
 
-	// set up ssh connection
-	s := new(utils.SSHConfig)
 	// Set up SSHConfig
-	s.User = creds["user"]
-	s.Password = creds["pass"]
-	s.Host = creds["host"] + ":" + creds["port"]
+	s := &utils.SSHConfig{
+		User: device.User,
+		Pass: device.Pass,
+		Host: device.Host + ":" + strconv.Itoa(device.Port),
+	}
 
 	// Special case... only some collectors need to make some modifications.
 	if collectorSpecial, ok := collector.(CollectorSpecial); ok {
-		collectorSpecial.ModifySSHConfig(*s)
+		collectorSpecial.ModifySSHConfig(s)
 	}
 
 	connection, err := utils.SSHClient(*s)
@@ -46,13 +64,13 @@ func (cw *CollectorWorker) Run(collector Collector) {
 		panic(err)
 	}
 
-	// TODO: Grab just the last result.
-
-	parsed, _ := collector.ParseResult(result[2].Output)
-
+	// DONE: Grab just the last result.
 	// result[2].Output
-	// match[0]
-	log.Printf("Writing: %s\n%d\n", which, len(parsed))
+	lastResult := result[len(result)-1].Output
+	parsed, _ := collector.ParseResult(lastResult)
 
-	utils.WriteFile(parsed, which+".txt")
+	// match[0]
+	log.Printf("Writing: %s\n%d\n", device.Name, len(parsed))
+
+	utils.WriteFile(parsed, device.Name+".txt")
 }

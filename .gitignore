@@ -3,6 +3,9 @@ bin/
 vendor/
 
 # Config file
+contra.conf
+
+# TODO: Remove after verified none existing.
 devices.conf
 
 # Local GIT workspace

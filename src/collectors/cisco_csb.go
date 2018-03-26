@@ -1,65 +1,48 @@
 package collectors
 
 import (
+	"contra/src/configuration"
 	"contra/src/utils"
-	"fmt"
+	"github.com/google/goexpect"
+	"log"
 	"regexp"
-	"time"
 )
 
-// CollectCsb pulls the device config for a Cisco Small Business device.
-func CollectCsb() string {
-	fmt.Printf("Collect Works - Cisco_csb\n")
+// devCiscoCsb pulls the device config for a Cisco Small Business device.
+type devCiscoCsb struct {
+	configuration.DeviceConfig
+}
 
-	// set up ssh connection
-	s := new(utils.SSHConfig)
+func makeCiscoCsb(d configuration.DeviceConfig) Collector {
+	return &devCiscoCsb{d}
+}
 
-	creds := FetchConfig("csb")
-	// Set up SSHConfig
-	s.User = creds["user"]
-	s.Password = creds["pass"]
-	s.Host = creds["host"] + ":" + creds["port"]
-	s.Ciphers = []string{"aes256-cbc", "aes128-cbc"}
+// BuildBatcher for CiscoCSB
+// This is assuming prompt for User Name on Cisco CSB - this may not always be the case
+func (p *devCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
+	return utils.SimpleBatcher([][]string{
+		{"User Name:", p.DeviceConfig.User + "\n"},
+		{"Password:", p.DeviceConfig.Pass + "\n"},
+		{".*#", "terminal datadump\n"},
+		{".*#", "show running-config\n"},
+		{".*#"},
+	})
+}
 
-	connection, err := utils.SSHClient(*s)
-
-	if err != nil {
-		panic(err)
-	}
-
-	// Output we expect to receive
-	receive := map[int]string{
-		1: "User Name:", // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
-		2: "Password:",
-		3: ".*#",
-		4: ".*#",
-		5: ".*#",
-	}
-
-	// Commands we will send in response to output above
-	send := map[int]string{
-		1: creds["user"] + "\n",
-		2: creds["pass"] + "\n",
-		3: "terminal datadump\n",
-		4: "show running-config\n",
-	}
-
-	// Build batcher
-	batch := utils.BuildBatcher(send, receive)
-
-	// call GatherExpect to collect the configs
-	result, err := utils.GatherExpect(batch, time.Second*10, connection)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Print(len(result))
+// ParseResult write me.
+func (p *devCiscoCsb) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
-	config := regexp.MustCompile(`config-file-header[\s\S]*?#`) // This may break if there is a '#' in the config
+	// This may break if there is a '#' in the config
+	searchx := regexp.MustCompile(`config-file-header[\s\S]*?#`)
 
-	match := config.FindStringSubmatch(result[len(result)-1].Output)
+	match := searchx.FindStringSubmatch(result)
 
-	utils.WriteFile(match[0], "cisco_csb.txt")
-	fmt.Printf(match[0])
-	return match[0]
+	return match[0], nil
+}
+
+// ModifySSHConfig since CiscoCSB needs special ciphers.
+func (p *devCiscoCsb) ModifySSHConfig(config *utils.SSHConfig) {
+	log.Println("Including Ciphers for Cisco CSB.")
+
+	config.Ciphers = []string{"aes256-cbc", "aes128-cbc"}
 }

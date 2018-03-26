@@ -14,11 +14,11 @@ func CollectProcurve() string {
 	// set up ssh connection
 	s := new(utils.SSHConfig)
 
-	creds := FetchConfig("procurve")
-	// Set up SSHConfig
-	s.User = creds["user"]
-	s.Password = creds["pass"]
-	s.Host = creds["host"] + ":" + creds["port"]
+	//creds := FetchConfig("procurve")
+	//// Set up SSHConfig
+	//s.User = creds["user"]
+	//s.Password = creds["pass"]
+	//s.Host = creds["host"] + ":" + creds["port"]
 
 	connection, err := utils.SSHClient(*s)
 

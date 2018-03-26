@@ -26,5 +26,7 @@ test: fmt vet lint
 run: linux64
 	./bin/contra
 
-.PHONY: all deps fmt vet test run
+testrun: test run
+
+.PHONY: all deps fmt vet test run testrun
 .PHONY: binaries linux64 first

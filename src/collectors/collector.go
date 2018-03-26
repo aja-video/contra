@@ -1,7 +1,9 @@
 package collectors
 
 import (
+	"contra/src/configuration"
 	"contra/src/utils"
+	"fmt"
 	"github.com/google/goexpect"
 )
 
@@ -13,10 +15,24 @@ type Collector interface {
 
 // CollectorSpecial is special.
 type CollectorSpecial interface {
-	ModifySSHConfig(config utils.SSHConfig)
+	ModifySSHConfig(config *utils.SSHConfig)
 }
 
 // CollectorDefinition write me.
 type CollectorDefinition struct {
-	name string
+	name        string
+	LocalConfig configuration.DeviceConfig
+}
+
+// MakeCollector will generate the appropriate collector based on the
+// type string passed in by the configuration.
+func MakeCollector(d configuration.DeviceConfig) (Collector, error) {
+	switch d.Type {
+	case "cisco_csb":
+		return makeCiscoCsb(d), nil
+	case "pfsense":
+		return makePfsense(d), nil
+	default:
+		return nil, fmt.Errorf("unrecognized collector type: %v", d.Type)
+	}
 }
