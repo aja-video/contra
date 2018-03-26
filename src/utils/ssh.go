@@ -7,17 +7,17 @@ import (
 
 //SSHConfig type to map SSH Configs
 type SSHConfig struct {
-	User     string
-	Password string
-	Host     string
-	Ciphers  []string
+	User    string
+	Pass    string
+	Host    string
+	Ciphers []string
 }
 
 // SSHClient dials up our target device.
 func SSHClient(c SSHConfig) (*ssh.Client, error) {
 	config := &ssh.ClientConfig{
 		User:            c.User,
-		Auth:            []ssh.AuthMethod{ssh.Password(c.Password)},
+		Auth:            []ssh.AuthMethod{ssh.Password(c.Pass)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: this should be an option
 		Timeout:         time.Second * 10,            //TODO: this should be an option
 	}

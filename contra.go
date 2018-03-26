@@ -2,22 +2,22 @@ package main
 
 import (
 	"contra/src/collectors"
+	"contra/src/configuration"
 	"contra/src/utils"
 	"fmt"
 )
 
 func main() {
 	// Print something.
-	fmt.Printf("Contra\n")
+	fmt.Printf("\n=== Contra ===\n - Network Device Configuration Tracking\n - AJA Video Systems\n\n")
 
-	// Run sample collectors.
-	collectors.CollectpfSense()
-	collectors.CollectComware()
-	collectors.CollectProcurve()
-	collectors.CollectCsb()
-	// Pull a result from an ini using a third party package
-	str := utils.ExampleIni()
-	fmt.Printf("Found: %v\n", str)
+	config := configuration.GetConfig()
+
+	worker := collectors.CollectorWorker{
+		RunConfig: config,
+	}
+
+	worker.RunCollectors()
 
 	utils.Commit()
 }
