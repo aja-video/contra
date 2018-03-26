@@ -24,6 +24,10 @@ func MakeCollector(d configuration.DeviceConfig) (Collector, error) {
 	switch d.Type {
 	case "cisco_csb":
 		return makeCiscoCsb(d), nil
+	case "procurve":
+		return makeProcurve(d), nil
+	case "comware":
+		return makeComware(d), nil
 	case "pfsense":
 		return makePfsense(d), nil
 	default:
