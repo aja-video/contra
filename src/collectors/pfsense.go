@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// Collect currently collects a pfSense config.
-func Collect() string {
+// CollectpfSense collects a pfSense config.
+func CollectpfSense() string {
 	fmt.Printf("Collect Works - pfSense\n")
 
 	// set up ssh connection
