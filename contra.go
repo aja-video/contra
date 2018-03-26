@@ -10,10 +10,19 @@ func main() {
 	// Print something.
 	fmt.Printf("Contra\n")
 
+	// TODO: rework this... config parsing should build a struct of collectors.
+	which := []string{"pfsense"}
+	for range which {
+		collector := &collectors.DevicePfsense{}
+		worker := collectors.CollectorWorker{}
+		worker.Run(collector)
+	}
+
 	// Run sample collectors.
 	collectors.Collect()
 	collectors.CollectComware()
 	collectors.CollectProcurve()
+
 	// Pull a result from an ini using a third party package
 	str := utils.ExampleIni()
 	fmt.Printf("Found: %v\n", str)
