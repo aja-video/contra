@@ -20,6 +20,9 @@ func Commit(status git.Status, worktree git.Worktree) error {
 		case git.Modified:
 			log.Printf("Modified Config File %s\n", file)
 			worktree.Add(file)
+		case git.Deleted:
+			log.Printf("Deleted Config File %s\n", file)
+			worktree.Remove(file)
 		default:
 			log.Printf("Unhandled git status for file %s\n", file)
 
