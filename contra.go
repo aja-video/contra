@@ -1,24 +1,10 @@
 package main
 
 import (
-	"contra/src/collectors"
-	"contra/src/configuration"
-	"contra/src/utils/git"
-	"fmt"
+	"contra/src/core"
 )
 
 func main() {
-	// Print something.
-	fmt.Printf("\n=== Contra ===\n - Network Device Configuration Tracking\n - AJA Video Systems\n\n")
-
-	config := configuration.GetConfig()
-
-	worker := collectors.CollectorWorker{
-		RunConfig: config,
-	}
-
-	worker.RunCollectors()
-
-	utils.GitOps(config)
-
+	app := new(core.Application)
+	app.Start()
 }

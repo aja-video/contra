@@ -9,6 +9,7 @@ type Config struct {
 	// Debug
 	Debug      bool
 	Copyrights bool
+	Quiet      bool
 
 	// Config
 	ConfigFile string
@@ -69,6 +70,7 @@ func (d DeviceConfig) GetName() string {
 // getConfigDefaults provides reasonable defaults for Contra!
 func getConfigDefaults() *Config {
 	return &Config{
+		false,
 		false,
 		false,
 		"contra.conf",
