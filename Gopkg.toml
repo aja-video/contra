@@ -37,3 +37,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/google/goexpect"
+
+[[constraint]]
+  name = "gopkg.in/src-d/go-git.v4"
+  version = "4.2.0"

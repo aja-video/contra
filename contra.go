@@ -3,7 +3,7 @@ package main
 import (
 	"contra/src/collectors"
 	"contra/src/configuration"
-	"contra/src/utils"
+	"contra/src/utils/git"
 	"fmt"
 )
 
@@ -19,5 +19,6 @@ func main() {
 
 	worker.RunCollectors()
 
-	utils.Commit()
+	utils.GitOps(config)
+
 }
