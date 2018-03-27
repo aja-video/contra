@@ -1,12 +1,16 @@
 package utils
 
-import "os"
+import (
+	"contra/src/configuration"
+	"fmt"
+	"os"
+)
 
 // WriteFile saves output to a file
-func WriteFile(config string, name string) error {
-
+func WriteFile(c configuration.Config, config string, name string) error {
+	fmt.Println(c.Workspace)
 	// Create file inside workspace folder
-	f, err := os.Create("workspace/" + name)
+	f, err := os.Create(c.Workspace + name)
 	if err != nil {
 		panic(err)
 	}

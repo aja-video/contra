@@ -1,31 +1,26 @@
 package utils
 
 import (
-	"log"
+	"gopkg.in/src-d/go-git.v4"
 )
 
 //GitStatus reports the current working tree status
-func GitStatus(g *Git) (bool, []string, error) {
+func GitStatus(worktree git.Worktree) (git.Status, bool, error) {
 	// Assume no changes
 	gitChanged := false
-	var updates []string
-	s, err := g.Repo.Worktree()
+
+	// Get status
+	changes, err := worktree.Status()
+
 	if err != nil {
-		panic(err)
-	}
-	changes, err := s.Status()
-	if ! changes.IsClean() {
-		gitChanged = true
-		for config := range changes {
-			log.Printf("Config Changed: %s\n", config)
-			updates = append(updates, config)
-		}
-	} else {
-		log.Println("No config changes")
+		return nil, false, err
 	}
 
-	//log.Println(s.Status())
-	//fmt.Printf("Current GIT status:\n%v", s.Status())
-	return gitChanged, updates, err
+	// Return true if something has changed
+	if !changes.IsClean() {
+		gitChanged = true
+	}
+
+	return changes, gitChanged, err
 
 }

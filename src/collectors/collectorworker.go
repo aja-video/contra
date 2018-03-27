@@ -63,5 +63,5 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
-	utils.WriteFile(parsed, device.Name+".txt")
+	utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt")
 }
