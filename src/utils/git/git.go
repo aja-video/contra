@@ -29,12 +29,19 @@ func GitOps(c *configuration.Config) error {
 	}
 
 	// Grab status
-	status, err := GitStatus(repo)
+	status, changes, err := GitStatus(repo)
+
+	if status {
+		//GitCommit(repo, changes)
+		log.Println(changes)
+		log.Println("Commit Placeholder")
+	}
+
 	// TODO: Make this useful
 	if err != nil {
 		log.Printf("Unable to get status information from repository %s:\n %s", repo.Path, err)
 	} else {
-		log.Printf("Current git revision: %s", status)
+		log.Printf("Current git status: %s", status)
 	}
-	return nil
+	return err
 }
