@@ -9,7 +9,7 @@ import (
 // WriteFile saves output to a file
 func WriteFile(c configuration.Config, config string, name string) error {
 	// Create file inside workspace folder
-	err := wsDir(c)
+	err := workspaceExists(c)
 	if err == nil {
 		f, err := os.Create(c.Workspace + "/" + name)
 		if err != nil {
@@ -25,8 +25,8 @@ func WriteFile(c configuration.Config, config string, name string) error {
 	return err
 }
 
-// wsDir checks for or creates the workspace directory
-func wsDir(c configuration.Config) error {
+// workspaceExists checks for or creates the workspace directory
+func workspaceExists(c configuration.Config) error {
 	// Check if the workspace is a directory
 	if ws, err := os.Stat(c.Workspace); err == nil && ws.IsDir() {
 		return nil
