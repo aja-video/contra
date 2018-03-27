@@ -43,11 +43,11 @@ func GitOps(c *configuration.Config) error {
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
-		Commit(status, *worktree)
+		err = Commit(status, *worktree)
 		//TODO: Diffs
 		//TODO: push is untested
-		if repo.Remote && push {
-			repo.Repo.Push(&git.PushOptions{})
+		if repo.Remote {
+			err = repo.Repo.Push(&git.PushOptions{})
 
 		} else {
 			log.Println("No changes to commit")
