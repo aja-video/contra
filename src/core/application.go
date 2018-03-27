@@ -22,7 +22,7 @@ func (a *Application) Start() {
 	// Parse the config, which brings in flags.
 	a.config = configuration.GetConfig()
 
-	// Display banner first, in case we crash on parsing the config.
+	// Display banner second, in case config declares a quiet run.
 	a.DisplayBanner()
 
 	// Determine what to do.
