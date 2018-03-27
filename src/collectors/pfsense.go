@@ -16,12 +16,15 @@ func makePfsense(d configuration.DeviceConfig) Collector {
 }
 
 // BuildBatcher for pfSense
-// "option:" should always match the initial connection string
 func (p *devPfsense) BuildBatcher() ([]expect.Batcher, error) {
-	return utils.SimpleBatcher([][]string{
-		{"option:", "8\n"},
-		{".*root", "cat /conf/config.xml\n"},
-		{"</pfsense>"},
+	// The "OK" result must be the first entry for variable.
+	// The more the better, since this is constantly checking every case for a match.
+	// - So simply having .*root will match multiple times throughout the dump.
+	return utils.VariableBatcher([][]string{
+		{`</pfsense>`}, // Found the "OK" result!
+		{`Enter an option: `, "8\n"},
+		{`/root(\x1b\[[0-9;]*m)?:`, "cat /conf/config.xml\n"},
+		{`\$ `, "cat /conf/config.xml\n"},
 	})
 }
 

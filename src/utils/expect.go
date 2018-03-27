@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/google/goexpect"
 	"golang.org/x/crypto/ssh"
+	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -12,6 +14,9 @@ func GatherExpect(batcher []expect.Batcher, timeout time.Duration, ssh *ssh.Clie
 
 	// attach expect to our SSH connection
 	ex, _, err := expect.SpawnSSH(ssh, timeout)
+	// Use the below for verbose debugging output. Should only be used for debugging since it may
+	// dump passwords to the screen depending on the collector used.
+	//ex, _, err := expect.SpawnSSH(ssh, timeout, expect.Verbose(true), expect.VerboseWriter(os.Stdout))
 
 	if err != nil {
 		panic(err)
@@ -48,3 +53,38 @@ func SimpleBatcher(definition [][]string) ([]expect.Batcher, error) {
 
 	return batchSlice, nil
 }
+
+// VariableBatcher uses send and receive, with the possibility to skip steps.
+// TODO: Do we need https://godoc.org/google.golang.org/grpc/codes ?
+func VariableBatcher(definition [][]string) ([]expect.Batcher, error) {
+	caseSlice := make([]expect.Caser, 0)
+
+	for i, set := range definition {
+		// Make sure we have either 1 or 2 values.
+		if len(set) < 1 || len(set) > 2 {
+			return nil, fmt.Errorf("definition expects 1 or 2 values, but found: %d", len(set))
+		}
+
+		// Always have a receive to match.
+		batchCase := &expect.Case{R: regexp.MustCompile(set[0])}
+		if len(set) == 2 {
+			batchCase.S = set[1]
+			// If this matches more than Rt times, fail with the number of the case.
+			batchCase.T = expect.Continue(expect.NewStatus(7, "failed case: "+strconv.Itoa(i)))
+			// For this VariableBatcher, we will only match once.
+			batchCase.Rt = 1
+		} else {
+			// The success case.
+			batchCase.T = expect.OK()
+		}
+		caseSlice = append(caseSlice, batchCase)
+	}
+
+	// Put all the cases in a BCas command, and put the Caser in the command.
+	batchSlice := []expect.Batcher{&expect.BCas{C: caseSlice}}
+
+	return batchSlice, nil
+}
+
+// ComplexBatcher will implement more complex switch cases.
+//func ComplexBatcher() {}
