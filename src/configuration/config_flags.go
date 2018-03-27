@@ -9,10 +9,14 @@ import (
 func parseConfigFlags() {
 	defaults := getConfigDefaults()
 
+	// TODO: "v" is declared by glog, do we want to use that?
+	//flag.Bool("v", defaults.Verbose, "Display additional output details.")
+
 	flag.String("c", defaults.ConfigFile, "Config file name.")
 	flag.Int("p", defaults.Concurrency, "Parallel concurrent threads to use for collection.")
 	flag.Duration("i", defaults.Interval, "Interval in seconds between run calls.")
 	flag.Duration("t", defaults.Timeout, "Timeout default in seconds to wait for collection to finish.")
+	flag.Bool("q", defaults.Quiet, "Suppress most output except for problems or warnings.")
 	flag.Bool("debug", defaults.Debug, "Enable DEBUG flag for development.")
 	flag.Bool("x", defaults.AllowInsecureSSH, "Allow untrusted SSH keys.")
 	flag.Bool("e", defaults.EmailEnabled, "Enable or disable email when changes found.")
@@ -48,6 +52,8 @@ func mergeConfigFlags(config *Config) {
 			config.DisableCollection = flagVal.Value.(flag.Getter).Get().(bool)
 		case "x":
 			config.AllowInsecureSSH = flagVal.Value.(flag.Getter).Get().(bool)
+		case "q":
+			config.Quiet = flagVal.Value.(flag.Getter).Get().(bool)
 		case "e":
 			config.EmailEnabled = flagVal.Value.(flag.Getter).Get().(bool)
 		case "w":
