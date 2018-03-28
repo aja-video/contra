@@ -9,8 +9,7 @@ import (
 
 // Commit will add and commit changes
 func Commit(status git.Status, worktree git.Worktree) error {
-	log.Println("------------------GIT COMMIT OUTPUT-------------")
-
+	// Iterate over changed files to determine what is changed
 	for file, status := range status {
 		// TODO: Maybe a cleaner way to do this?
 		switch status.Worktree {
@@ -29,6 +28,7 @@ func Commit(status git.Status, worktree git.Worktree) error {
 		}
 	}
 
+	// Do the commit
 	commit, err := worktree.Commit(
 		"Contra commit.",
 		&git.CommitOptions{

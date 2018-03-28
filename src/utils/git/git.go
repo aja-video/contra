@@ -37,7 +37,6 @@ func GitOps(c *configuration.Config) error {
 
 	// Grab status and changes
 	status, changes, err := GitStatus(*worktree)
-
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
