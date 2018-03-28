@@ -45,9 +45,7 @@ func GitOps(c *configuration.Config) error {
 		// push to remote if configured
 		if repo.Remote {
 			err = repo.Repo.Push(&git.PushOptions{})
-		} else {
 		}
 	}
-
 	return err
 }
