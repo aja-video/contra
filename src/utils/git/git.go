@@ -3,7 +3,6 @@ package utils
 import (
 	"contra/src/configuration"
 	"gopkg.in/src-d/go-git.v4"
-	"log"
 )
 
 // Git holds git repo data
@@ -20,9 +19,8 @@ func GitOps(c *configuration.Config) error {
 	// Set up git instance
 	repo := new(Git)
 	repo.Path = c.Workspace
-
+	// Determine if we are going to do a git push
 	repo.Remote = c.GitPush
-	// repo.url = c.GitURL TODO: Determine if this should be configurable
 
 	// Open Repo for use by Contra
 	err := GitOpen(repo)
@@ -37,22 +35,17 @@ func GitOps(c *configuration.Config) error {
 		return err
 	}
 
-	// Grab status
+	// Grab status and changes
 	status, changes, err := GitStatus(*worktree)
-
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
 		err = Commit(status, *worktree)
 		//TODO: Diffs
-		//TODO: push is untested
+		// push to remote if configured
 		if repo.Remote {
 			err = repo.Repo.Push(&git.PushOptions{})
-
-		} else {
-			log.Println("No changes to commit")
 		}
 	}
-
 	return err
 }
