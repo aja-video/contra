@@ -66,6 +66,7 @@ func (a *Application) Route() {
 		a.RunDaemon()
 	} else {
 		// Standard operating procedure.
+		log.Println("Contra is not configured to run as a Daemon, performing a single collection")
 		a.StandardRun()
 	}
 }

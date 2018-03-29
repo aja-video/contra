@@ -80,5 +80,6 @@ func getConfigDefaults() *Config {
 		SMTPHost:     "smtphost",
 		SMTPPort:     25,
 		HTTPListen:   "localhost:5002",
+		Daemonize:    false,
 	}
 }
