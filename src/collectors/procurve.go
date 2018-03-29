@@ -7,16 +7,16 @@ import (
 	"regexp"
 )
 
-type devProcurve struct {
+type deviceProcurve struct {
 	configuration.DeviceConfig
 }
 
 func makeProcurve(d configuration.DeviceConfig) Collector {
-	return &devProcurve{d}
+	return &deviceProcurve{d}
 }
 
 // BuildBatcher for Procurve
-func (p *devProcurve) BuildBatcher() ([]expect.Batcher, error) {
+func (p *deviceProcurve) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
 		{"continue", "a\n"},
 		{".*#", "no page\n"},
@@ -26,7 +26,7 @@ func (p *devProcurve) BuildBatcher() ([]expect.Batcher, error) {
 }
 
 // ParseResult for Procurve
-func (p *devProcurve) ParseResult(result string) (string, error) {
+func (p *deviceProcurve) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
 	// this regex assumes all procurve configs begin with 'hostname', and end with 'password manager'
 	// Should probably find a better match...
