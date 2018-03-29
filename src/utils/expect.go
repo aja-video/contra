@@ -10,7 +10,7 @@ import (
 )
 
 // GatherExpect initializes expect with our SSH connection and gathers results of the batch.
-func GatherExpect(batcher []expect.Batcher, timeout time.Duration, ssh *ssh.Client) (*[]expect.BatchRes, error) {
+func GatherExpect(batcher []expect.Batcher, timeout time.Duration, ssh *ssh.Client) ([]expect.BatchRes, error) {
 
 	// attach expect to our SSH connection
 	ex, _, err := expect.SpawnSSH(ssh, timeout)
@@ -30,7 +30,7 @@ func GatherExpect(batcher []expect.Batcher, timeout time.Duration, ssh *ssh.Clie
 	}
 
 	// return config data
-	return &gather, err
+	return gather, err
 }
 
 // SimpleBatcher implements a straight forward send/receive pattern.
