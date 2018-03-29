@@ -33,10 +33,10 @@ func (p *devCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
 func (p *devCiscoCsb) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
 	// This may break if there is a '#' in the config
-	matcher := regexp.MustCompile(`config-file-header[\s\S]*?#`)
+	matcher := regexp.MustCompile(`show.*[\s\S]\n(.*[\s\S]*)\n[\S.]*#`)
 	match := matcher.FindStringSubmatch(result)
 
-	return match[0], nil
+	return match[1], nil
 }
 
 // ModifySSHConfig since CiscoCSB needs special ciphers.
