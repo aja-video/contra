@@ -20,6 +20,7 @@ type Config struct {
 	Timeout           time.Duration
 	AllowInsecureSSH  bool
 	DisableCollection bool
+	Daemonize         bool
 
 	// Git
 	GitPush bool

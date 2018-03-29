@@ -46,7 +46,7 @@ func (cw *CollectorWorker) RunCollectors() {
 
 // Run the collector for this device.
 func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
-	fmt.Printf("Collect Start: %s\n", device.Name)
+	log.Printf("Collect Start: %s\n", device.Name)
 
 	collector, _ := MakeCollector(device)
 
