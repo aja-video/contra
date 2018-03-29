@@ -16,13 +16,29 @@ type CollectorWorker struct {
 
 // RunCollectors runs all collectors
 func (cw *CollectorWorker) RunCollectors() {
+	// Create a channel with a maximum size of configured concurrency
+	queue := make(chan bool, cw.RunConfig.Concurrency)
 	for _, device := range cw.RunConfig.Devices {
 		if device.Disabled {
 			log.Printf("Config disabled: %v", device.Name)
 			continue
 		}
+		// Add an element to the queue for each enabled device
+		queue <- true
+		// Start collection process for each device
+		go func(config configuration.DeviceConfig) {
+			cw.Run(config)
+			// Remove an element from the queue when the collection has finished
+			defer func() {
+				<-queue
+			}()
+		}(device)
 
-		cw.Run(device)
+	}
+	// If we can add to the queue a number of elements equal to concurrency
+	// our goroutines are finished and we can leave this function
+	for l := 0; l < cap(queue); l++ {
+		queue <- true
 	}
 
 	fmt.Printf("Completed collections: %d\n", len(cw.RunConfig.Devices))
@@ -58,10 +74,11 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 	}
 
 	// Grab just the last result.
-	lastResult := result[len(result)-1].Output
+	lastResult := (*result)[len((*result))-1].Output
 	parsed, _ := collector.ParseResult(lastResult)
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
 	utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt")
+
 }
