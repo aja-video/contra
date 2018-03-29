@@ -23,7 +23,7 @@ func (p *devPfsense) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.VariableBatcher([][]string{
 		{`</pfsense>`}, // Found the "OK" result!
 		{`Enter an option: `, "8\n"},
-		{`/root(\x1b\[[0-9;]*m)?:`, "cat /conf/config.xml\n"},
+		{`/root(.*[[0-9;]*m)?:`, "cat /conf/config.xml\n"},
 		{`\$ `, "cat /conf/config.xml\n"},
 	})
 }
