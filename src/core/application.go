@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 )
 
 const version = "1.0.0"
@@ -27,6 +28,16 @@ func (a *Application) Start() {
 
 	// Determine what to do.
 	a.Route()
+}
+
+//RunDaemon will persist and run collectors at the configured interval
+func (a *Application) RunDaemon() {
+	interval := a.config.Interval
+	for {
+		a.StandardRun()
+		log.Printf("Collection finished, sleeping for %s\n", interval)
+		time.Sleep(interval)
+	}
 }
 
 // StandardRun if there are no special cases designated by the configuration.
@@ -50,8 +61,12 @@ func (a *Application) Route() {
 		a.DisplayCopyrights()
 	} else if a.config.Debug {
 		a.DisplayDebugInfo()
+	} else if a.config.Daemonize {
+		// Repeat collectors every interval
+		a.RunDaemon()
 	} else {
-		// Standard operating proceedure.
+		// Standard operating procedure.
+		log.Println("Contra is not configured to run as a Daemon, performing a single collection")
 		a.StandardRun()
 	}
 }

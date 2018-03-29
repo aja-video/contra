@@ -3,7 +3,6 @@ package collectors
 import (
 	"contra/src/configuration"
 	"contra/src/utils"
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -41,12 +40,12 @@ func (cw *CollectorWorker) RunCollectors() {
 		queue <- true
 	}
 
-	fmt.Printf("Completed collections: %d\n", len(cw.RunConfig.Devices))
+	log.Printf("Completed collections: %d\n", len(cw.RunConfig.Devices))
 }
 
 // Run the collector for this device.
 func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
-	fmt.Printf("Collect Start: %s\n", device.Name)
+	log.Printf("Collect Start: %s\n", device.Name)
 
 	collector, _ := MakeCollector(device)
 
