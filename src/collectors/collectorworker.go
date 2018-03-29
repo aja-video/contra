@@ -74,11 +74,10 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 	}
 
 	// Grab just the last result.
-	lastResult := (result)[len((result))-1].Output
+	lastResult := result[len(result)-1].Output
 	parsed, _ := collector.ParseResult(lastResult)
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
 	utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt")
-
 }
