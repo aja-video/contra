@@ -12,9 +12,6 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, er
 	// Iterate over changed files to determine what is changed
 	var changes []string
 	for file, status := range status {
-		// Tack on filenames.
-		changes = append(changes, file)
-
 		// Tack on diffs.
 		diff, err := GitDiff(path, file)
 		if err != nil {
