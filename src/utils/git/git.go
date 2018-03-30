@@ -42,7 +42,7 @@ func GitOps(c *configuration.Config) error {
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
-		changesOut, err := Commit(status, *worktree)
+		changesOut, err := Commit(repo.Path, status, *worktree)
 		if err != nil {
 			return err
 		}

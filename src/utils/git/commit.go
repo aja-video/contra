@@ -8,12 +8,18 @@ import (
 )
 
 // Commit will add and commit changes
-func Commit(status git.Status, worktree git.Worktree) ([]string, error) {
+func Commit(path string, status git.Status, worktree git.Worktree) ([]string, error) {
 	// Iterate over changed files to determine what is changed
 	var changes []string
 	for file, status := range status {
 		changes = append(changes, file)
 		// TODO: Maybe a cleaner way to do this?
+		diff, err := GitDiff(path, file)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, diff)
+
 		switch status.Worktree {
 		case git.Untracked:
 			log.Printf("New Config File %s\n", file)
