@@ -27,7 +27,7 @@ func (p *deviceVyatta) BuildBatcher() ([]expect.Batcher, error) {
 
 // ParseResult for Vyatta
 func (p *deviceVyatta) ParseResult(result string) (string, error) {
-	matcher := regexp.MustCompile(`configuration.*([\s\S]*)\n[\S\s.]*\$`)
+	matcher := regexp.MustCompile(`(.*\{[\s\S]*\})\n[\S\s]*\$`)
 	match := matcher.FindStringSubmatch(result)
 	return match[1], nil
 }
