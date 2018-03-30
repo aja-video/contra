@@ -8,9 +8,11 @@ import (
 )
 
 // Commit will add and commit changes
-func Commit(status git.Status, worktree git.Worktree) error {
+func Commit(status git.Status, worktree git.Worktree) ([]string, error) {
 	// Iterate over changed files to determine what is changed
+	var changes []string
 	for file, status := range status {
+		changes = append(changes, file)
 		// TODO: Maybe a cleaner way to do this?
 		switch status.Worktree {
 		case git.Untracked:
@@ -39,8 +41,8 @@ func Commit(status git.Status, worktree git.Worktree) error {
 			},
 		})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	log.Printf("Contra Git Commit: %s", commit)
-	return err
+	return changes, err
 }

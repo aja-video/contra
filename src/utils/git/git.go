@@ -2,7 +2,10 @@ package utils
 
 import (
 	"contra/src/configuration"
+	"contra/src/utils"
 	"gopkg.in/src-d/go-git.v4"
+	"log"
+	"strings"
 )
 
 // Git holds git repo data
@@ -40,7 +43,14 @@ func GitOps(c *configuration.Config) error {
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
-		err = Commit(status, *worktree)
+		changesOut, err := Commit(status, *worktree)
+		if err != nil {
+			return err
+		}
+		err = gitSendEmail(c, changesOut)
+		if err != nil {
+			return err
+		}
 		//TODO: Diffs
 		// push to remote if configured
 		if repo.Remote {
@@ -48,4 +58,28 @@ func GitOps(c *configuration.Config) error {
 		}
 	}
 	return err
+}
+
+//gitSendEmail sends git related email notifications
+func gitSendEmail(c *configuration.Config, changes []string) error {
+
+	// Bail out if email is disabled
+	if !c.EmailEnabled {
+		log.Println("Email notifications are disabled.")
+		return nil
+	}
+
+	// Convert slice of changes to a comma separated string
+	changesString := strings.Join(changes, "\n")
+
+	log.Printf("%s changed, sending email\n", changesString)
+
+	// Send email with changes
+	err := utils.SendEmail(c, "Contra-Changes", changesString)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
