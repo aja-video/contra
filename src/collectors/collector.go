@@ -30,6 +30,8 @@ func MakeCollector(d configuration.DeviceConfig) (Collector, error) {
 		return makeComware(d), nil
 	case "pfsense":
 		return makePfsense(d), nil
+	case "vyatta":
+		return makeVyatta(d), nil
 	default:
 		return nil, fmt.Errorf("unrecognized collector type: %v", d.Type)
 	}
