@@ -12,14 +12,17 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, er
 	// Iterate over changed files to determine what is changed
 	var changes []string
 	for file, status := range status {
+		// Tack on filenames.
 		changes = append(changes, file)
-		// TODO: Maybe a cleaner way to do this?
+
+		// Tack on diffs.
 		diff, err := GitDiff(path, file)
 		if err != nil {
 			return nil, err
 		}
 		changes = append(changes, diff)
 
+		// TODO: Maybe a cleaner way to do this?
 		switch status.Worktree {
 		case git.Untracked:
 			log.Printf("New Config File %s\n", file)
