@@ -2,20 +2,21 @@ package utils
 
 import (
 	"contra/src/configuration"
+	"errors"
 	"net/smtp"
 	"strconv"
 )
 
+type loginAuth struct {
+	username, password string
+}
+
 // SendEmail to user
 // - Consider using a library.
 func SendEmail(c *configuration.Config, subject, message string) error {
-	// Set up authentication information.
-	auth := smtp.PlainAuth(
-		"",
-		c.SMTPUser,
-		c.SMTPPass,
-		c.SMTPHost,
-	)
+
+	auth := buildAuth(c.SMTPUser, c.SMTPPass)
+
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	err := smtp.SendMail(
@@ -31,8 +32,32 @@ func SendEmail(c *configuration.Config, subject, message string) error {
 				message,
 		),
 	)
+
 	if err != nil {
 		return err
 	}
+
 	return nil
+}
+
+func buildAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", []byte{}, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		switch string(fromServer) {
+		case "Username:":
+			return []byte(a.username), nil
+		case "Password:":
+			return []byte(a.password), nil
+		default:
+			return nil, errors.New("unknown from server")
+		}
+	}
+	return nil, nil
 }

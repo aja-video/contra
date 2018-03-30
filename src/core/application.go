@@ -51,7 +51,10 @@ func (a *Application) StandardRun() {
 	worker.RunCollectors()
 
 	// And check for any necessary commits.
-	utils.GitOps(a.config)
+	err := utils.GitOps(a.config)
+	if err != nil {
+		panic(err)
+	}
 
 	//Send email notification on changes
 }

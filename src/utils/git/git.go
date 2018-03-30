@@ -4,6 +4,7 @@ import (
 	"contra/src/configuration"
 	"contra/src/utils"
 	"gopkg.in/src-d/go-git.v4"
+	"log"
 	"strings"
 )
 
@@ -62,11 +63,19 @@ func GitOps(c *configuration.Config) error {
 //gitSendEmail sends git related email notifications
 func gitSendEmail(c *configuration.Config, changes []string) error {
 
+	// Bail out if email is disabled
+	if !c.EmailEnabled {
+		log.Println("Email notifications are disabled.")
+		return nil
+	}
+
 	// Convert slice of changes to a comma separated string
-	changesString := strings.Join(changes, ",")
+	changesString := strings.Join(changes, "\n")
+
+	log.Printf("%s changed, sending email\n", changesString)
 
 	// Send email with changes
-	err := utils.SendEmail(c, "Contra Changes", changesString)
+	err := utils.SendEmail(c, "Contra-Changes", changesString)
 
 	if err != nil {
 		return err
