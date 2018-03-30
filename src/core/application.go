@@ -52,6 +52,8 @@ func (a *Application) StandardRun() {
 
 	// And check for any necessary commits.
 	utils.GitOps(a.config)
+
+	//Send email notification on changes
 }
 
 // Route determines what to do, and kicks off the doing.
