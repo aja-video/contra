@@ -7,10 +7,6 @@ import (
 	"strconv"
 )
 
-type loginAuth struct {
-	username, password string
-}
-
 // SendEmail to user
 // - Consider using a library.
 func SendEmail(c *configuration.Config, subject, message string) error {
@@ -38,6 +34,10 @@ func SendEmail(c *configuration.Config, subject, message string) error {
 	}
 
 	return nil
+}
+
+type loginAuth struct {
+	username, password string
 }
 
 func buildAuth(username, password string) smtp.Auth {
