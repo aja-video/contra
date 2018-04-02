@@ -20,18 +20,18 @@ type CollectorSpecial interface {
 
 // MakeCollector will generate the appropriate collector based on the
 // type string passed in by the configuration.
-func MakeCollector(d *configuration.DeviceConfig) (Collector, error) {
+func MakeCollector(d configuration.DeviceConfig) (Collector, error) {
 	switch d.Type {
 	case "cisco_csb":
-		return makeCiscoCsb(*d), nil
+		return makeCiscoCsb(d), nil
 	case "procurve":
-		return makeProcurve(*d), nil
+		return makeProcurve(d), nil
 	case "comware":
-		return makeComware(*d), nil
+		return makeComware(d), nil
 	case "pfsense":
-		return makePfsense(*d), nil
+		return makePfsense(d), nil
 	case "vyatta":
-		return makeVyatta(*d), nil
+		return makeVyatta(d), nil
 	default:
 		return nil, fmt.Errorf("unrecognized collector type: %v", d.Type)
 	}

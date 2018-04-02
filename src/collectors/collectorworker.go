@@ -26,7 +26,7 @@ func (cw *CollectorWorker) RunCollectors() {
 		// Add an element to the queue for each enabled device
 		queue <- true
 		// Start collection process for each device
-		go func(config *configuration.DeviceConfig) {
+		go func(config configuration.DeviceConfig) {
 			cw.Run(config)
 			// Remove an element from the queue when the collection has finished
 			defer func() {
@@ -45,7 +45,7 @@ func (cw *CollectorWorker) RunCollectors() {
 }
 
 // Run the collector for this device.
-func (cw *CollectorWorker) Run(device *configuration.DeviceConfig) error {
+func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	log.Printf("Collect Start: %s\n", device.Name)
 
 	collector, _ := MakeCollector(device)
@@ -89,7 +89,7 @@ func (cw *CollectorWorker) Run(device *configuration.DeviceConfig) error {
 }
 
 // collectFailure handles collector failures
-func (cw *CollectorWorker) collectFailure(d *configuration.DeviceConfig, err error) error {
+func (cw *CollectorWorker) collectFailure(d configuration.DeviceConfig, err error) error {
 	// define email notification content
 	var message []string
 	log.Printf("Warn Queue Length %v, cap %v", len(d.FailChan), cap(d.FailChan))

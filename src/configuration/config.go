@@ -47,7 +47,7 @@ type Config struct {
 	HTTPListen       string
 
 	// Devices
-	Devices []*DeviceConfig
+	Devices []DeviceConfig
 }
 
 // DeviceConfig holds the device specific settings.
