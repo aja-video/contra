@@ -31,6 +31,7 @@ func mergeConfigFile(config *Config, filePath string) {
 		section.MapTo(&deviceConfig)
 		// Copy the section name into the device config for reference.
 		deviceConfig.Name = section.Name()
-		config.Devices = append(config.Devices, deviceConfig)
+		deviceConfig.FailChan = make(chan bool, 3)
+		config.Devices = append(config.Devices, &deviceConfig)
 	}
 }

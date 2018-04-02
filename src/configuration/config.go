@@ -47,7 +47,7 @@ type Config struct {
 	HTTPListen       string
 
 	// Devices
-	Devices []DeviceConfig
+	Devices []*DeviceConfig
 }
 
 // DeviceConfig holds the device specific settings.
@@ -61,7 +61,7 @@ type DeviceConfig struct {
 	Disabled       bool
 	CustomTimeout  time.Duration
 	CommandTimeout time.Duration
-	FailChan	   chan bool
+	FailChan       chan bool
 	FailureWarning int
 }
 

@@ -5,8 +5,8 @@ import (
 	"contra/src/utils"
 	"log"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 // CollectorWorker write me.
@@ -23,11 +23,10 @@ func (cw *CollectorWorker) RunCollectors() {
 			log.Printf("Config disabled: %v", device.Name)
 			continue
 		}
-		device.FailChan = make(chan bool, 3)
 		// Add an element to the queue for each enabled device
 		queue <- true
 		// Start collection process for each device
-		go func(config configuration.DeviceConfig) {
+		go func(config *configuration.DeviceConfig) {
 			cw.Run(config)
 			// Remove an element from the queue when the collection has finished
 			defer func() {
@@ -46,7 +45,7 @@ func (cw *CollectorWorker) RunCollectors() {
 }
 
 // Run the collector for this device.
-func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
+func (cw *CollectorWorker) Run(device *configuration.DeviceConfig) error {
 	log.Printf("Collect Start: %s\n", device.Name)
 
 	collector, _ := MakeCollector(device)
@@ -86,7 +85,7 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	return nil
 }
 
-func (cw *CollectorWorker) CollectFailure(d configuration.DeviceConfig) error {
+func (cw *CollectorWorker) CollectFailure(d *configuration.DeviceConfig) error {
 	// define email notification content
 	var message []string
 	log.Printf("Warn Queue Length %v, cap %v", len(d.FailChan), cap(d.FailChan))
