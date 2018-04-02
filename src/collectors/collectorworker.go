@@ -78,7 +78,12 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	if len(device.FailChan) > 0 {
 		<-device.FailChan
 	}
-
+	// Close ssh connection
+	err = connection.Close()
+	if err != nil {
+		// TODO: Should this be fatal/return?
+		log.Printf("Error closing SSH Connection for %s: %v\n", device.Name, err)
+	}
 	// Grab just the last result.
 	lastResult := result[len(result)-1].Output
 	parsed, _ := collector.ParseResult(lastResult)
