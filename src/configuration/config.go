@@ -61,6 +61,10 @@ type DeviceConfig struct {
 	Disabled       bool
 	CustomTimeout  time.Duration
 	CommandTimeout time.Duration
+	// Channel to track device collection failures
+	FailChan chan bool
+	// Number of failures to trigger an alert. A value of 0 disables alerts
+	FailureWarning int
 }
 
 // GetName provides a simple implementation for the Collector interface.

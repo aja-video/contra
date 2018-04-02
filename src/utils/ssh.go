@@ -31,7 +31,7 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 	client, err := ssh.Dial("tcp", c.Host, config)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return client, err
