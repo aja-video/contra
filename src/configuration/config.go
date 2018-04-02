@@ -61,7 +61,9 @@ type DeviceConfig struct {
 	Disabled       bool
 	CustomTimeout  time.Duration
 	CommandTimeout time.Duration
-	FailChan       chan bool
+	// Channel to track device collection failures
+	FailChan chan bool
+	// Number of failures to trigger an alert. A value of 0 disables alerts
 	FailureWarning int
 }
 

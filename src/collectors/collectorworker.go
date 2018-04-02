@@ -72,7 +72,7 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	if err != nil {
 		return cw.collectFailure(device, err)
 	}
-	// Read from failchan if it isn't empty
+	// Read from FailChan if it isn't empty
 	if len(device.FailChan) > 0 {
 		<-device.FailChan
 	}
@@ -92,19 +92,21 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 func (cw *CollectorWorker) collectFailure(d configuration.DeviceConfig, err error) error {
 	// define email notification content
 	var message []string
-	log.Printf("Warn Queue Length %v, cap %v", len(d.FailChan), cap(d.FailChan))
 	message = append(message, "Contra was unable to gather configs from",
 		d.Name, strconv.Itoa(d.FailureWarning), "times", "last error:", err.Error())
+	// Add an element to the warning queue if it isn't full
 	if len(d.FailChan) < cap(d.FailChan) {
 		d.FailChan <- true
-		log.Printf("Warn Queue Length %v", len(d.FailChan))
-	} else {
+	} else if cap(d.FailChan) > 0 {
 		// Fire off an email if the warning queue is full and email is enabled
 		utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
+		// Empty the channel after we've reset a notification
+		for len(d.FailChan) > 0 {
+			<-d.FailChan
+		}
 	}
 	// log a warning
 	log.Printf("WARNING: Contra failed to gather configs from %s with error: %s\n", d.Name, err.Error())
-	// add an element to the warning channel if it isn't full
 
 	return err
 }
