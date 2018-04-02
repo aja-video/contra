@@ -91,7 +91,7 @@ func (cw *CollectorWorker) CollectFailure(d *configuration.DeviceConfig) error {
 	log.Printf("Warn Queue Length %v, cap %v", len(d.FailChan), cap(d.FailChan))
 	message = append(message, "Contra was unable to gather configs from",
 		d.Name, strconv.Itoa(d.FailureWarning), "times", "last error:")
-	if len(d.FailChan) <= cap(d.FailChan) {
+	if len(d.FailChan) < cap(d.FailChan) {
 		d.FailChan <- true
 		log.Printf("Warn Queue Length %v", len(d.FailChan))
 	} else {
