@@ -70,8 +70,11 @@ func (cw *CollectorWorker) Run(device *configuration.DeviceConfig) error {
 	// TODO: Verify pointer/reference/dereference is necessary.
 	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
 	if err != nil {
-		//return err
-		return cw.CollectFailure(device)
+		return cw.collectFailure(device, err)
+	}
+	// Read from failchan if it isn't empty
+	if len(device.FailChan) > 0 {
+		<-device.FailChan
 	}
 
 	// Grab just the last result.
@@ -85,12 +88,13 @@ func (cw *CollectorWorker) Run(device *configuration.DeviceConfig) error {
 	return nil
 }
 
-func (cw *CollectorWorker) CollectFailure(d *configuration.DeviceConfig) error {
+// collectFailure handles collector failures
+func (cw *CollectorWorker) collectFailure(d *configuration.DeviceConfig, err error) error {
 	// define email notification content
 	var message []string
 	log.Printf("Warn Queue Length %v, cap %v", len(d.FailChan), cap(d.FailChan))
 	message = append(message, "Contra was unable to gather configs from",
-		d.Name, strconv.Itoa(d.FailureWarning), "times", "last error:")
+		d.Name, strconv.Itoa(d.FailureWarning), "times", "last error:", err.Error())
 	if len(d.FailChan) < cap(d.FailChan) {
 		d.FailChan <- true
 		log.Printf("Warn Queue Length %v", len(d.FailChan))
@@ -99,8 +103,8 @@ func (cw *CollectorWorker) CollectFailure(d *configuration.DeviceConfig) error {
 		utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
 	}
 	// log a warning
-	log.Printf("WARNING: Contra was unable to gather configs from %s \n", d.Name)
+	log.Printf("WARNING: Contra failed to gather configs from %s with error: %s\n", d.Name, err.Error())
 	// add an element to the warning channel if it isn't full
 
-	return nil
+	return err
 }
