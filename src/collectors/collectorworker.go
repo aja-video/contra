@@ -65,7 +65,9 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	}
 
 	connection, err := utils.SSHClient(*s)
-
+	if err != nil {
+		return cw.collectFailure(device, err)
+	}
 	// call GatherExpect to collect the configs
 	// TODO: Verify pointer/reference/dereference is necessary.
 	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
