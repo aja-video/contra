@@ -19,14 +19,14 @@ func GatherExpect(batcher []expect.Batcher, timeout time.Duration, ssh *ssh.Clie
 	//ex, _, err := expect.SpawnSSH(ssh, timeout, expect.Verbose(true), expect.VerboseWriter(os.Stdout))
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Gather data - batcher defined inside collector
 	gather, err := ex.ExpectBatch(batcher, timeout)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// return config data

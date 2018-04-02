@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"time"
+	"strings"
 )
 
 // CollectorWorker write me.
@@ -22,6 +23,7 @@ func (cw *CollectorWorker) RunCollectors() {
 			log.Printf("Config disabled: %v", device.Name)
 			continue
 		}
+		device.FailChan = make(chan bool, 3)
 		// Add an element to the queue for each enabled device
 		queue <- true
 		// Start collection process for each device
@@ -44,7 +46,7 @@ func (cw *CollectorWorker) RunCollectors() {
 }
 
 // Run the collector for this device.
-func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
+func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	log.Printf("Collect Start: %s\n", device.Name)
 
 	collector, _ := MakeCollector(device)
@@ -69,7 +71,8 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 	// TODO: Verify pointer/reference/dereference is necessary.
 	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
 	if err != nil {
-		panic(err)
+		//return err
+		return cw.CollectFailure(device)
 	}
 
 	// Grab just the last result.
@@ -80,4 +83,25 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) {
 
 	utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt")
 
+	return nil
+}
+
+func (cw *CollectorWorker) CollectFailure(d configuration.DeviceConfig) error {
+	// define email notification content
+	var message []string
+	log.Printf("Warn Queue Length %v, cap %v", len(d.FailChan), cap(d.FailChan))
+	message = append(message, "Contra was unable to gather configs from",
+		d.Name, strconv.Itoa(d.FailureWarning), "times", "last error:")
+	if len(d.FailChan) <= cap(d.FailChan) {
+		d.FailChan <- true
+		log.Printf("Warn Queue Length %v", len(d.FailChan))
+	} else {
+		// Fire off an email if the warning queue is full and email is enabled
+		utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
+	}
+	// log a warning
+	log.Printf("WARNING: Contra was unable to gather configs from %s \n", d.Name)
+	// add an element to the warning channel if it isn't full
+
+	return nil
 }

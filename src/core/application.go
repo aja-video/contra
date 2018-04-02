@@ -41,7 +41,7 @@ func (a *Application) RunDaemon() {
 }
 
 // StandardRun if there are no special cases designated by the configuration.
-func (a *Application) StandardRun() {
+func (a *Application) StandardRun() error {
 	// Initialize our main worker.
 	worker := collectors.CollectorWorker{
 		RunConfig: a.config,
@@ -53,10 +53,10 @@ func (a *Application) StandardRun() {
 	// And check for any necessary commits.
 	err := utils.GitOps(a.config)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	//Send email notification on changes
+	return nil
 }
 
 // Route determines what to do, and kicks off the doing.

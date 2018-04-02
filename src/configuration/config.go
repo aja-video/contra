@@ -61,6 +61,8 @@ type DeviceConfig struct {
 	Disabled       bool
 	CustomTimeout  time.Duration
 	CommandTimeout time.Duration
+	FailChan	   chan bool
+	FailureWarning int
 }
 
 // GetName provides a simple implementation for the Collector interface.
