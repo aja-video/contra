@@ -21,25 +21,23 @@ After the initial build, `make run` or `make` then execute `./bin/contra` will w
 
 ## Dependency Management
 
-Considering `dep` for tracking dependencies.
-See https://golang.github.io/dep/docs/installation.html
+`dep` is used for dependency tracking
 
 ## Supported Devices
 
 ### Current
 
-- None
+- pfSense
+- Cisco Small Business
+- Vyataa
+- HP/Procurve
+- HP/Comware
 
 ### Soon
-
-- PFSense
-- Cisco CSB
 
 ### Someday
 
 - Cisco
-- Comware
-- Vyatta
 - Juniper (JunOS)
 
 ## Device Configuration
