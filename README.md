@@ -21,7 +21,8 @@ After the initial build, `make run` or `make` then execute `./bin/contra` will w
 
 ## Dependency Management
 
-`dep` is used for dependency tracking
+- `dep` is used for dependency tracking
+- See https://golang.github.io/dep/docs/installation.html
 
 ## Supported Devices
 
