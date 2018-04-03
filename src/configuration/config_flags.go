@@ -25,7 +25,7 @@ func parseConfigFlags() {
 	flag.String("listen", defaults.HTTPListen, "Host and port to use for HTTP status server.")
 	flag.Bool("copyrights", defaults.Copyrights, "Display copyright licenses of compiled packages.")
 	flag.Bool("d", defaults.Daemonize, "Run as Daemon")
-
+	flag.Bool("version", defaults.Version, "Display Contra version")
 	flag.Parse()
 }
 
@@ -66,6 +66,8 @@ func mergeConfigFlags(config *Config) {
 		case "d":
 			config.Daemonize = flagVal.Value.(flag.Getter).Get().(bool)
 			// Fail if not defined.
+		case "version":
+			config.Version = flagVal.Value.(flag.Getter).Get().(bool)
 		default:
 			log.Fatalf("Flag merge not configured for %v", flagVal)
 		}

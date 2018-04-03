@@ -10,6 +10,7 @@ type Config struct {
 	Debug      bool
 	Copyrights bool
 	Quiet      bool
+	Version    bool
 
 	// Config
 	ConfigFile string
