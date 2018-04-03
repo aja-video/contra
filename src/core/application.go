@@ -85,6 +85,7 @@ func (a *Application) DisplayBanner() {
 		fmt.Printf("\n=== Contra ===\n"+
 			" - Network Device Configuration Tracking\n"+
 			" - AJA Video Systems, Inc. Version: %s\n\n", version)
+		log.Printf("Contra started with configuration file %s\n", a.config.ConfigFile)
 	}
 }
 

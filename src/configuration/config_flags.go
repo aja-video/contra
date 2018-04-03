@@ -3,6 +3,7 @@ package configuration
 import (
 	"flag"
 	"log"
+	"os"
 	"time"
 )
 
@@ -75,22 +76,35 @@ func mergeConfigFlags(config *Config) {
 }
 
 func configFlagsGetConfigPath() string {
+	var configPath string
 	// Flags must be parsed.
 	if !flag.Parsed() {
 		panic("Flags not yet parsed.")
 	}
 
 	// Grab the default config path.
-	configPath := getConfigDefaults().ConfigFile
+	configDefaultPath := getConfigDefaults().ConfigFile
 
 	// And check to see if we want to override it with a flag.
 	configFlag := flag.Lookup("c")
 	if configFlag != nil {
 		found := flag.Lookup("c").Value.(flag.Getter).Get().(string)
-		if found != configPath {
+		if found != configDefaultPath {
 			//log.Printf("Config: %s, Switching to found: %s", configPath, found)
-			configPath = found
+			return found
 		}
+	}
+	// if the default config exists use it
+	if _, err := os.Stat(configDefaultPath); err == nil {
+		configPath = configDefaultPath
+	}
+	// try for /etc/contra.conf
+	if _, err := os.Stat(`/etc/contra.conf`); err == nil {
+		configPath = `/etc/contra.conf`
+	}
+	// Die with a useful error if we can't find a config file
+	if len(configPath) == 0 {
+		log.Fatalf("ERROR: Unable to open config file %s", configPath)
 	}
 
 	return configPath
