@@ -66,6 +66,8 @@ func (a *Application) Route() {
 		a.DisplayCopyrights()
 	} else if a.config.Debug {
 		a.DisplayDebugInfo()
+	} else if a.config.Version {
+		a.DisplayVersion()
 	} else if a.config.Daemonize {
 		// Repeat collectors every interval
 		a.RunDaemon()
@@ -102,5 +104,11 @@ func (a *Application) DisplayCopyrights() {
 func (a *Application) DisplayDebugInfo() {
 	log.Println("DEBUG ENABLED: Dumping config and exiting.")
 	log.Println(a.config)
+	os.Exit(0)
+}
+
+// DisplayVersion prints the Contra version and exits
+func (a *Application) DisplayVersion() {
+	fmt.Println(version)
 	os.Exit(0)
 }
