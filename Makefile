@@ -16,8 +16,7 @@ rpm64:
 	mkdir -p build/rpm/contra/etc
 	cp bin/contra build/rpm/contra/usr/local/bin/
 	cp contra.example.conf build/rpm/contra/etc/contra.conf.dist
-	fpm -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) -C build/rpm/contra .
-	mv contra-$(VERSION)-1.x86_64.rpm bin/
+	fpm -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) -C build/rpm/contra .
 
 deb64:
 	rm -rf build/deb
@@ -25,8 +24,7 @@ deb64:
 	cp bin/contra build/deb/contra/usr/local/bin/
 	mkdir -p build/deb/contra/etc
 	cp contra.example.conf build/deb/contra/etc/contra.conf.dist
-	fpm -s dir -t deb -n contra -a amd64 -v $(VERSION) -C build/deb/contra .
-	mv contra_$(VERSION)_amd64.deb bin/
+	fpm -p bin/ -s dir -t deb -n contra -a amd64 -v $(VERSION) -C build/deb/contra .
 
 deps:
 	dep ensure -v
