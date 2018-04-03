@@ -1,6 +1,7 @@
 # Binaries, builds and vendor folders.
 bin/
 vendor/
+build/
 
 # Config file
 contra.conf
