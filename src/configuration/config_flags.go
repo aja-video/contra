@@ -102,9 +102,7 @@ func configFlagsGetConfigPath() string {
 		return `/etc/contra.conf`
 	}
 	// Die with a useful error if we can't find a config file
-	if len(configPath) == 0 {
-		log.Fatalf("ERROR: Unable to open config file %s", configPath)
-	}
+	log.Fatalf("ERROR: Unable to open config file %s", configPath)
 
 	return configPath
 }
