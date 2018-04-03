@@ -19,6 +19,23 @@ func mergeConfigFile(config *Config, filePath string) {
 		panic(err)
 	}
 
+	// TODO: go-ini *can* write ini files. But, not sure if it can strategically write a single value.
+	// We may not want to write the entire file since some config values may be loaded from command
+	// line, which we do not want to incidentally persist.
+	//
+	// I think we should keep the config key the same, so a user can simply delete the hashed value,
+	// put a legit key, then run it. Without having to change a key from like EmailPassEncrypted to EmailPass.
+	// Therefore in order to avoid double encrypting, I'm thinking of prefixing encrypted passwords.
+	// Perhaps prefix with something like:
+	// SMTPPass = `~~~enc~~~WkXAVkH-bPZAAKjj5T4hy_kINJRAZckoxEpjiXS_ZhI=`
+	// The risk of someone's actual password being ~~~enc~~~trololo or something is pretty low, so we can
+	// just check if the password has ~~~enc~~~ at the beginning, strip it and decrypt.
+	//
+	//log.Println(config)
+	//os.Exit(1)
+	// 	encryptedpass := configuration.EncryptConfig(key, pass)
+	//	pass := configuration.DecryptConfig(key, encryptedpass)
+
 	// Map/Load Device Configs
 	for _, section := range iniFile.Sections() {
 		if section.Name() == "main" || section.Name() == "DEFAULT" {

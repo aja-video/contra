@@ -13,7 +13,8 @@ type Config struct {
 	Version    bool
 
 	// Config
-	ConfigFile string
+	ConfigFile       string
+	EncryptPasswords bool
 
 	// Collector Settings
 	Concurrency       int
@@ -76,15 +77,15 @@ func (d DeviceConfig) GetName() string {
 // getConfigDefaults provides reasonable defaults for Contra!
 func getConfigDefaults() *Config {
 	return &Config{
-		ConfigFile:   "contra.conf",
-		Concurrency:  30,
-		Interval:     300 * time.Second,
-		Timeout:      120 * time.Second,
-		Workspace:    "/workspace",
-		EmailSubject: "Changes from Contra!",
-		SMTPHost:     "smtphost",
-		SMTPPort:     25,
-		HTTPListen:   "localhost:5002",
-		Daemonize:    false,
+		ConfigFile:       "contra.conf",
+		EncryptPasswords: true,
+		Concurrency:      30,
+		Interval:         300 * time.Second,
+		Timeout:          120 * time.Second,
+		Workspace:        "/workspace",
+		EmailSubject:     "Changes from Contra!",
+		SMTPHost:         "smtphost",
+		SMTPPort:         25,
+		HTTPListen:       "localhost:5002",
 	}
 }
