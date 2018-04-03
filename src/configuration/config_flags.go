@@ -104,5 +104,6 @@ func configFlagsGetConfigPath() string {
 	// Die with a useful error if we can't find a config file
 	log.Fatalf("ERROR: Unable to open config file %s", configPath)
 
-	return configPath
+	// Nothing to return here
+	return ""
 }
