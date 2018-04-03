@@ -109,6 +109,11 @@ func (a *Application) DisplayDebugInfo() {
 
 // DisplayVersion prints the Contra version and exits
 func (a *Application) DisplayVersion() {
-	fmt.Println(version)
+	// If Quiet is set, just display the version.
+	// If Quiet is not set, the version is included in from DisplayBanner.
+	if a.config.Quiet {
+		fmt.Println(version)
+	}
+
 	os.Exit(0)
 }
