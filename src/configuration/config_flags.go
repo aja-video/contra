@@ -3,6 +3,7 @@ package configuration
 import (
 	"flag"
 	"log"
+	"os"
 	"time"
 )
 
@@ -89,9 +90,20 @@ func configFlagsGetConfigPath() string {
 		found := flag.Lookup("c").Value.(flag.Getter).Get().(string)
 		if found != configPath {
 			//log.Printf("Config: %s, Switching to found: %s", configPath, found)
-			configPath = found
+			return found
 		}
 	}
+	// if the default config exists use it
+	if _, err := os.Stat(configPath); err == nil {
+		return configPath
+	}
+	// try for /etc/contra.conf
+	if _, err := os.Stat(`/etc/contra.conf`); err == nil {
+		return `/etc/contra.conf`
+	}
+	// Die with a useful error if we can't find a config file
+	log.Fatalf("ERROR: Unable to open config file %s", configPath)
 
-	return configPath
+	// Nothing to return here
+	return ""
 }
