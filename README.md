@@ -51,6 +51,10 @@ Pass=`Some#pass;word`
 Pass="""Some#pass;word"""
 ```
 
+## Building
+
+Requires `fpm` found at: http://fpm.readthedocs.io/en/latest/installing.html
+
 ## License
 
 Contra is licensed under the MIT License
