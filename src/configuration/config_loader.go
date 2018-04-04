@@ -33,6 +33,11 @@ func loadConfig() *Config {
 
 	// Load config data from INI file on top of default values.
 	configPath := configFlagsGetConfigPath()
+
+	// Remember the file we picked, such as /etc/contra.conf
+	config.ConfigFile = configPath
+
+	// Merge the config file params into the config.
 	mergeConfigFile(config, configPath)
 
 	// Fetch flags and merge on top of file+default values.
@@ -47,6 +52,9 @@ func loadConfig() *Config {
 		// TODO: Friendly way to exit?
 		log.Fatalln("Timeout should be a minimum of 1s. Did you forget the seconds?")
 	}
+
+	// Check and decrypt any passwords to the loaded in-memory config.
+	decryptLoadedConfig(config)
 
 	return config
 }
