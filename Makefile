@@ -13,9 +13,10 @@ packages: binaries rpm64 deb64
 rpm64: binaries
 	rm -rf build/rpm
 	mkdir -p build/rpm/contra/usr/local/bin
-	mkdir -p build/rpm/contra/etc
+	mkdir -p build/rpm/contra/etc/systemd/system
 	cp bin/contra build/rpm/contra/usr/local/bin/
 	cp contra.example.conf build/rpm/contra/etc/contra.conf
+	cp files/contra.service build/rpm/contra/etc/systemd/system/contra.service
 	fpm --description "Configuration Tracking for Network Devices" --url "https://gitlab.aja.com/go/contra" \
 		--license "mit" -m "it@aja.com" -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) -C build/rpm/contra .
 
