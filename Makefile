@@ -6,7 +6,7 @@ all: test binaries
 
 first: deps test run
 
-binaries: clean linux64
+binaries: staging clean linux64
 
 linux64:
 	@echo -----linux64-----
@@ -41,6 +41,10 @@ clean:
 	find build -name "$(DEBDIR)" -type d -prune -exec rm -rf "{}" \;
 	find build -name "$(RPMDIR)" -type d -prune -exec rm -rf "{}" \;
 
+staging:
+	@test -d bin ||mkdir bin
+	@test -d build ||mkdir build
+
 deps:
 	dep ensure -v
 
@@ -61,5 +65,5 @@ run: linux64
 
 testrun: test run
 
-.PHONY: all clean deps fmt vet test run testrun
+.PHONY: all clean deps fmt vet test run testrun staging
 .PHONY: binaries linux64 first
