@@ -26,44 +26,8 @@ func (a *Application) Start() {
 	// Display banner second, in case config declares a quiet run.
 	a.DisplayBanner()
 
-	// TODO: This would probably be better to only run ONCE on StandardRun/Daemonize.
-	// Now that we have completely determined our configs (including command line flags)
-	// If we want to encrypt passwords, then kick it off.
-	if a.config.EncryptPasswords {
-		configuration.EncryptConfigFile(a.config.ConfigFile)
-	}
-
 	// Determine what to do.
 	a.Route()
-}
-
-//RunDaemon will persist and run collectors at the configured interval
-func (a *Application) RunDaemon() {
-	interval := a.config.Interval
-	for {
-		a.StandardRun()
-		log.Printf("Collection finished, sleeping for %s\n", interval)
-		time.Sleep(interval)
-	}
-}
-
-// StandardRun if there are no special cases designated by the configuration.
-func (a *Application) StandardRun() error {
-	// Initialize our main worker.
-	worker := collectors.CollectorWorker{
-		RunConfig: a.config,
-	}
-
-	// Collect everything
-	worker.RunCollectors()
-
-	// And check for any necessary commits.
-	err := utils.GitOps(a.config)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Route determines what to do, and kicks off the doing.
@@ -75,13 +39,22 @@ func (a *Application) Route() {
 		a.DisplayDebugInfo()
 	} else if a.config.Version {
 		a.DisplayVersion()
-	} else if a.config.Daemonize {
-		// Repeat collectors every interval
-		a.RunDaemon()
 	} else {
-		// Standard operating procedure.
-		log.Println("Contra is not configured to run as a Daemon, performing a single collection")
-		a.StandardRun()
+		// Now that we have completely determined our configs (including command line flags)
+		// If we want to encrypt passwords, then kick it off before beginning normal execution.
+		if a.config.EncryptPasswords {
+			configuration.EncryptConfigFile(a.config.ConfigFile)
+		}
+
+		// Normal execution, determine daemon or run once.
+		if a.config.Daemonize {
+			// Repeat collectors every interval
+			a.RunDaemon()
+		} else {
+			// Run once.
+			log.Println("Contra is not configured to run as a Daemon, performing a single collection")
+			a.StandardRun()
+		}
 	}
 }
 
@@ -124,4 +97,33 @@ func (a *Application) DisplayVersion() {
 	}
 
 	os.Exit(0)
+}
+
+// StandardRun if there are no special cases designated by the configuration.
+func (a *Application) StandardRun() error {
+	// Initialize our main worker.
+	worker := collectors.CollectorWorker{
+		RunConfig: a.config,
+	}
+
+	// Collect everything
+	worker.RunCollectors()
+
+	// And check for any necessary commits.
+	err := utils.GitOps(a.config)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RunDaemon will persist and run collectors at the configured interval
+func (a *Application) RunDaemon() {
+	interval := a.config.Interval
+	for {
+		a.StandardRun()
+		log.Printf("Collection finished, sleeping for %s\n", interval)
+		time.Sleep(interval)
+	}
 }
