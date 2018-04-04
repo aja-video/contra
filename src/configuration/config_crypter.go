@@ -68,9 +68,7 @@ func EncryptConfigFile(filePath string) {
 }
 
 func decryptLoadedConfig(config *Config) {
-
-	fmt.Println(config)
-
+	// Checks all struct fields. Requiring the prefix means it only applies to top level values.
 	v := reflect.ValueOf(config).Elem()
 	for i := 0; i < v.NumField(); i++ {
 		// Check it!
