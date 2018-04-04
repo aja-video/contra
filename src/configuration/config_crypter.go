@@ -47,8 +47,8 @@ func EncryptConfigFile(filePath string) {
 	for _, section := range iniFile.Sections() {
 		for _, key := range section.Keys() {
 			if strings.Contains(key.Name(), "Pass") {
-				log.Printf("ENCRYPT: Pass Key Found - S: %s K: %s\n", section.Name(), key.Name())
 				if !strings.Contains(key.Value(), "~~contra~~") {
+					log.Printf("ENCRYPT: Pass Key Found - S: %s K: %s\n", section.Name(), key.Name())
 					key.SetValue("~~contra~~" + encryptConfig(encryptKey, key.Value()))
 					saveRequired = true
 				}
