@@ -3,7 +3,7 @@ all: test binaries
 
 first: deps test run
 
-binaries: linux64
+binaries: clean linux64
 
 linux64:
 	GOOS=linux GOARCH=amd64 go build -o bin/contra contra.go
@@ -29,6 +29,9 @@ deb64: binaries
 	fpm --description "Configuration Tracking for Network Devices" --url "https://gitlab.aja.com/go/contra" \
 		--license "mit" -m "it@aja.com" -p bin/ -s dir -t deb -n contra -a amd64 -v $(VERSION) -C build/deb/contra .
 
+clean:
+	rm -rf build/ bin/
+
 deps:
 	dep ensure -v
 
@@ -49,5 +52,5 @@ run: linux64
 
 testrun: test run
 
-.PHONY: all deps fmt vet test run testrun
+.PHONY: all clean deps fmt vet test run testrun
 .PHONY: binaries linux64 first
