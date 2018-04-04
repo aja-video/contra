@@ -11,7 +11,6 @@ linux64:
 packages: binaries rpm64 deb64
 
 rpm64: binaries
-	rm -rf build/rpm
 	mkdir -p build/rpm/contra/usr/local/bin
 	mkdir -p build/rpm/contra/etc/systemd/system
 	cp bin/contra build/rpm/contra/usr/local/bin/
@@ -21,7 +20,6 @@ rpm64: binaries
 		--license "mit" -m "it@aja.com" -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) -C build/rpm/contra .
 
 deb64: binaries
-	rm -rf build/deb
 	mkdir -p build/deb/contra/usr/local/bin
 	cp bin/contra build/deb/contra/usr/local/bin/
 	mkdir -p build/deb/contra/etc
