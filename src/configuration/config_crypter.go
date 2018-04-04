@@ -6,31 +6,121 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"github.com/go-ini/ini"
 	"io"
+	"log"
+	"reflect"
+	"strings"
 )
 
-// Based off: https://gist.github.com/manishtpatel/8222606
+// EncryptConfigFile will encrypt all the passwords in the full file.
+func EncryptConfigFile(filePath string) {
+	saveRequired := false
 
-func EncryptConfig(key, value string) string {
-	// This forces the byte array length to 32.
-	// The extra 0 padding is fine for our needs.
-	keyByte := make([]byte, 32)
-	copy(keyByte, key)
+	log.Println("ENCRYPT: Checking file: " + filePath)
+	iniFile, err := ini.Load(filePath)
+	if err != nil {
+		log.Println("ENCRYPT: Failed to load: " + filePath)
+		panic(err) // Critical....
+		//return nil, err
+	}
 
-	return EncryptSimple(keyByte, value)
+	// Find or create a config key.
+	if !iniFile.Section("main").HasKey("EncryptKey") {
+		// Generate new key.
+		keyNew := make([]byte, 32)
+		_, err := rand.Read(keyNew)
+		if err != nil {
+			panic(err) // TODO...
+		}
+
+		// Store it
+		iniFile.Section("main").NewKey("EncryptKey", fmt.Sprintf("%x", keyNew))
+		saveRequired = true
+	}
+
+	// If they muck with their key, there will be problems in the encryption step.
+	// Not much we can do...
+	encryptKey := iniFile.Section("main").Key("EncryptKey").Value()
+
+	// Core assumption, we will encrypt anything that the key includes "Pass" like "SMTPPass"
+	for _, section := range iniFile.Sections() {
+		for _, key := range section.Keys() {
+			if strings.Contains(key.Name(), "Pass") {
+				log.Printf("ENCRYPT: Pass Key Found - S: %s K: %s\n", section.Name(), key.Name())
+				if !strings.Contains(key.Value(), "~~contra~~") {
+					key.SetValue("~~contra~~" + encryptConfig(encryptKey, key.Value()))
+					saveRequired = true
+				}
+			}
+		}
+	}
+
+	if saveRequired {
+		// Save our changes to the config file.
+		log.Println("ENCRYPT: Change detected, saving file: " + filePath)
+		ini.PrettyFormat = true
+		ini.PrettySection = true
+		iniFile.SaveToIndent(filePath, "    ")
+	}
+
+	log.Println("ENCRYPT: Done with file: " + filePath)
 }
 
-func DecryptConfig(key, value string) string {
+func decryptLoadedConfig(config *Config) {
+
+	fmt.Println(config)
+
+	v := reflect.ValueOf(config).Elem()
+	for i := 0; i < v.NumField(); i++ {
+		// Check it!
+		val := fmt.Sprintf("%s", v.Field(i).Interface())
+		if strings.HasPrefix(val, "~~contra~~") {
+			// Need to decide...
+			val = strings.Replace(val, "~~contra~~", "", 1)
+			v.Field(i).SetString(decryptConfig(config.EncryptKey, val))
+		}
+	}
+
+	// And the device configs...
+	for id, device := range config.Devices {
+		v := reflect.ValueOf(&device).Elem()
+		for i := 0; i < v.NumField(); i++ {
+			// Check it!
+			val := fmt.Sprintf("%s", v.Field(i).Interface())
+			if strings.HasPrefix(val, "~~contra~~") {
+				// Need to decode...
+				val = strings.Replace(val, "~~contra~~", "", 1)
+				v.Field(i).SetString(decryptConfig(config.EncryptKey, val))
+			}
+		}
+
+		// Seems like brute forcing reflection in a bad way, but this works!
+		config.Devices[id] = v.Interface().(DeviceConfig)
+	}
+}
+
+func encryptConfig(key, value string) string {
 	// This forces the byte array length to 32.
 	// The extra 0 padding is fine for our needs.
 	keyByte := make([]byte, 32)
 	copy(keyByte, key)
 
-	return DecryptSimple(keyByte, value)
+	return encryptSimple(keyByte, value)
+}
+
+func decryptConfig(key, value string) string {
+	// This forces the byte array length to 32.
+	// The extra 0 padding is fine for our needs.
+	keyByte := make([]byte, 32)
+	copy(keyByte, key)
+
+	return decryptSimple(keyByte, value)
 }
 
 // EncryptSimple string to base64 crypto using AES
-func EncryptSimple(key []byte, text string) string {
+// - Concept from: https://gist.github.com/manishtpatel/8222606
+func encryptSimple(key []byte, text string) string {
 	// key := []byte(keyText)
 	plaintext := []byte(text)
 
@@ -55,7 +145,7 @@ func EncryptSimple(key []byte, text string) string {
 }
 
 // DecryptSimple from base64 to decrypted string
-func DecryptSimple(key []byte, cryptoText string) string {
+func decryptSimple(key []byte, cryptoText string) string {
 	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
 
 	block, err := aes.NewCipher(key)

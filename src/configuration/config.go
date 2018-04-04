@@ -15,6 +15,7 @@ type Config struct {
 	// Config
 	ConfigFile       string
 	EncryptPasswords bool
+	EncryptKey       string
 
 	// Collector Settings
 	Concurrency       int

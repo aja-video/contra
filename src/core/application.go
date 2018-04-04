@@ -26,6 +26,13 @@ func (a *Application) Start() {
 	// Display banner second, in case config declares a quiet run.
 	a.DisplayBanner()
 
+	// TODO: This would probably be better to only run ONCE on StandardRun/Daemonize.
+	// Now that we have completely determined our configs (including command line flags)
+	// If we want to encrypt passwords, then kick it off.
+	if a.config.EncryptPasswords {
+		configuration.EncryptConfigFile(a.config.ConfigFile)
+	}
+
 	// Determine what to do.
 	a.Route()
 }
