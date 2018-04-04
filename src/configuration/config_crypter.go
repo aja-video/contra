@@ -61,7 +61,14 @@ func EncryptConfigFile(filePath string) {
 		log.Println("ENCRYPT: Change detected, saving file: " + filePath)
 		ini.PrettyFormat = true
 		ini.PrettySection = true
-		iniFile.SaveToIndent(filePath, "    ")
+		err := iniFile.SaveToIndent(filePath, "    ")
+		// handle failures to write config file
+		if err != nil {
+			// Log warning and indicate temporary file written to /tmp
+			log.Printf("Failed to rewrite config file, error: %v\n", err)
+			log.Println("Attempting to write temporary config at /tmp/contra.conf-crypt")
+			iniFile.SaveToIndent("/tmp/contra.conf-crypt", "    ")
+		}
 	}
 
 	log.Println("ENCRYPT: Done with file: " + filePath)
