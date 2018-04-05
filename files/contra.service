@@ -1,0 +1,14 @@
+[Unit]
+Description=Contra Configuration Tracking for network devices
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/contra.pid
+ExecStart=/usr/local/bin/contra -c /etc/contra.conf -d
+Restart=on-abort
+ExecReload=/usr/bin/pkill contra
+
+[Install]
+WantedBy=multi-user.target
+Alias=contra.service
