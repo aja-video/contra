@@ -1,4 +1,4 @@
-@VERSION=$(shell ./bin/contra -q -version)
+VERSION=$(shell ./bin/contra -q -version)
 BINARY=contra
 RPMDIR=rpm
 DEBDIR=deb
