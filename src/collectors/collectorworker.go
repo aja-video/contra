@@ -72,6 +72,12 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	// TODO: Verify pointer/reference/dereference is necessary.
 	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
 	if err != nil {
+		// Close the connection if collection fails
+		closeErr := connection.Close()
+		if closeErr != nil {
+			log.Printf("Unable to close SSH connection %v", closeErr)
+		}
+		// return the collection error
 		return cw.collectFailure(device, err)
 	}
 	// Read from FailChan if it isn't empty
