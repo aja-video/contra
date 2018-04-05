@@ -4,6 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
+User=contra
+Group=contra
+WorkingDirectory=/opt/contra
 PIDFile=/var/run/contra.pid
 ExecStart=/usr/local/bin/contra -c /etc/contra.conf -d
 Restart=on-abort

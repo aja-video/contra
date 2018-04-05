@@ -18,11 +18,14 @@ rpm64: binaries
 	@echo -----rpm64-----
 	mkdir -p build/$(RPMDIR)/contra/usr/local/bin
 	mkdir -p build/$(RPMDIR)/contra/etc/systemd/system
+	mkdir -p build/$(RPMDIR)/contra/opt/contra/workspace
 	cp bin/$(BINARY) build/$(RPMDIR)/contra/usr/local/bin/
 	cp contra.example.conf build/$(RPMDIR)/contra/etc/contra.conf
-	cp files/contra.service build/$(RPMDIR)/contra/etc/systemd/system/contra.service
+	cp files/rpm/contra.service build/$(RPMDIR)/contra/etc/systemd/system/contra.service
 	fpm --description "Configuration Tracking for Network Devices" --url "https://gitlab.aja.com/go/contra" \
-		--license "mit" -m "it@aja.com" -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) -C build/$(RPMDIR)/$(BINARY) .
+		--license "mit" -m "it@aja.com" -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) \
+		--before-install files/rpm/pre-install.sh --before-remove files/rpm/pre-remove.sh --after-install \
+		files/rpm/post-install.sh --after-remove files/rpm/post-remove.sh -C build/$(RPMDIR)/$(BINARY) .
 
 deb64: binaries
 	@echo -----deb64-----
