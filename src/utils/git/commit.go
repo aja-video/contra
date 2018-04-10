@@ -35,8 +35,7 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []
 		// Tack on diffs.
 		diff, err := GitDiff(path, file)
 		if err != nil {
-			panic(err)
-			//return nil, nil, err
+			return nil, nil, err
 		}
 		changes = append(changes, diff)
 	}
