@@ -13,15 +13,6 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []
 	var changes []string
 	var changedFiles []string
 	for file, status := range status {
-		// Tack on files
-		changedFiles = append(changedFiles, file)
-
-		// Tack on diffs.
-		diff, err := GitDiff(path, file)
-		if err != nil {
-			return nil, nil, err
-		}
-		changes = append(changes, diff)
 
 		// TODO: Maybe a cleaner way to do this?
 		switch status.Worktree {
@@ -38,6 +29,15 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []
 			log.Printf("Unhandled git status for file %s\n", file)
 
 		}
+		// Tack on files
+		changedFiles = append(changedFiles, file)
+
+		// Tack on diffs.
+		diff, err := GitDiff(path, file)
+		if err != nil {
+			return nil, nil, err
+		}
+		changes = append(changes, diff)
 	}
 
 	// Do the commit
