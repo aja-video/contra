@@ -61,6 +61,7 @@ type DeviceConfig struct {
 	User           string
 	Pass           string
 	Port           int
+	Ciphers        string
 	Disabled       bool
 	CustomTimeout  time.Duration
 	CommandTimeout time.Duration

@@ -64,12 +64,16 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 		collectorSpecial.ModifySSHConfig(s)
 	}
 
+	// Pull in device config Cipher overrides if necessary.
+	if device.Ciphers != "" {
+		s.Ciphers = strings.Split(device.Ciphers, ",")
+	}
+
 	connection, err := utils.SSHClient(*s)
 	if err != nil {
 		return cw.collectFailure(device, err)
 	}
 	// call GatherExpect to collect the configs
-	// TODO: Verify pointer/reference/dereference is necessary.
 	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
 	if err != nil {
 		// Close the connection if collection fails
