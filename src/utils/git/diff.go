@@ -19,8 +19,7 @@ func gitDiffExec(path, filename string) (string, error) {
 	// Run!
 	diff, err := cmd.Output()
 	if err != nil {
-		panic(err)
-		//return "", err
+		return "", err
 	}
 
 	return string(diff), err

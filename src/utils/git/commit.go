@@ -26,7 +26,6 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []
 			log.Printf("Deleted Config File %s\n", file)
 			worktree.Remove(file)
 		default:
-			log.Println(status.Worktree)
 			log.Printf("Unhandled git status for file %s\n", file)
 
 		}
