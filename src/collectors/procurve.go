@@ -21,7 +21,7 @@ func (p *deviceProcurve) BuildBatcher() ([]expect.Batcher, error) {
 		{"continue", "a\n"},
 		{".*#", "no page\n"},
 		{".*#", "show running-config\n"},
-		{".*#"},
+		{".*[\\S]#"},
 	})
 }
 
