@@ -13,13 +13,14 @@ func GitDiff(path, filename string) (string, error) {
 // gitDiffExec uses os/exec to pull a git diff.
 func gitDiffExec(path, filename string) (string, error) {
 	// Prep the command.
-	cmd := exec.Command("git", "diff", "-U4", filename)
+	cmd := exec.Command("git", "diff", "-U4", "HEAD", filename)
 	// Switch to the workspace folder.
 	cmd.Dir = path
 	// Run!
 	diff, err := cmd.Output()
 	if err != nil {
-		return "", err
+		panic(err)
+		//return "", err
 	}
 
 	return string(diff), err
