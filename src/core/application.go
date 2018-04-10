@@ -100,7 +100,7 @@ func (a *Application) DisplayVersion() {
 }
 
 // StandardRun if there are no special cases designated by the configuration.
-func (a *Application) StandardRun() error {
+func (a *Application) StandardRun() {
 	// Initialize our main worker.
 	worker := collectors.CollectorWorker{
 		RunConfig: a.config,
@@ -112,10 +112,9 @@ func (a *Application) StandardRun() error {
 	// And check for any necessary commits.
 	err := utils.GitOps(a.config)
 	if err != nil {
-		return err
+		log.Printf("WARNING: Error encountered during GIT operations: %v\n", err)
 	}
 
-	return nil
 }
 
 // RunDaemon will persist and run collectors at the configured interval
