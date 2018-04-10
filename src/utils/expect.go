@@ -47,7 +47,7 @@ func SimpleBatcher(definition [][]string) ([]expect.Batcher, error) {
 		batchSlice = append(batchSlice, &expect.BExp{R: set[0]})
 		if len(set) == 2 {
 			// If a second value is provided, we plan to send it.
-			batchSlice = append(batchSlice, &expect.BSnd{S: set[1]})
+			batchSlice = append(batchSlice, &expect.BSnd{S: set[1] + "\n"})
 		}
 	}
 
@@ -68,7 +68,7 @@ func VariableBatcher(definition [][]string) ([]expect.Batcher, error) {
 		// Always have a receive to match.
 		batchCase := &expect.Case{R: regexp.MustCompile(set[0])}
 		if len(set) == 2 {
-			batchCase.S = set[1]
+			batchCase.S = set[1] + "\n"
 			// If this matches more than Rt times, fail with the number of the case.
 			batchCase.T = expect.Continue(expect.NewStatus(7, "failed case: "+strconv.Itoa(i)))
 			// For this VariableBatcher, we will only match once.

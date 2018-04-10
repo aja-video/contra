@@ -18,8 +18,8 @@ func makeComware(d configuration.DeviceConfig) Collector {
 // BuildBatcher for Comware
 func (p *deviceComware) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
-		{"<.*.>", "screen-length disable\n"},
-		{"<.*.>", "display current-configuration\n"},
+		{"<.*.>", "screen-length disable"},
+		{"<.*.>", "display current-configuration"},
 		{"return"},
 	})
 }
