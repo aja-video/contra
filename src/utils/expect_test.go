@@ -16,9 +16,9 @@ func TestSimpleBatcherEqualSndRcv(t *testing.T) {
 
 	expected := []expect.Batcher{
 		&expect.BExp{R: "a"},
-		&expect.BSnd{S: "b"},
+		&expect.BSnd{S: "b\n"},
 		&expect.BExp{R: "c"},
-		&expect.BSnd{S: "d"},
+		&expect.BSnd{S: "d\n"},
 	}
 
 	if !reflect.DeepEqual(batcher, expected) {
@@ -36,9 +36,9 @@ func TestSimpleBatcherNormalSndRcv(t *testing.T) {
 
 	expected := []expect.Batcher{
 		&expect.BExp{R: "a"},
-		&expect.BSnd{S: "b"},
+		&expect.BSnd{S: "b\n"},
 		&expect.BExp{R: "c"},
-		&expect.BSnd{S: "d"},
+		&expect.BSnd{S: "d\n"},
 		&expect.BExp{R: "e"},
 	}
 
