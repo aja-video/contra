@@ -19,8 +19,8 @@ func makeVyatta(d configuration.DeviceConfig) Collector {
 // BuildBatcher for Vyatta
 func (p *deviceVyatta) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
-		{`.*\$`, "terminal length 0" + "\n"},
-		{`.*\$`, "show configuration" + "\n"},
+		{`.*\$`, "terminal length 0"},
+		{`.*\$`, "show configuration"},
 		{`.*\$`},
 	})
 }

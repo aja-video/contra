@@ -21,10 +21,10 @@ func makeCiscoCsb(d configuration.DeviceConfig) Collector {
 // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
 func (p *deviceCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
-		{"User Name:", p.DeviceConfig.User + "\n"},
-		{"Password:", p.DeviceConfig.Pass + "\n"},
-		{".*#", "terminal datadump\n"},
-		{".*#", "show running-config\n"},
+		{"User Name:", p.DeviceConfig.User},
+		{"Password:", p.DeviceConfig.Pass},
+		{".*#", "terminal datadump"},
+		{".*#", "show running-config"},
 		{".*#"},
 	})
 }

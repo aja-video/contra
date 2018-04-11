@@ -18,9 +18,9 @@ func makeProcurve(d configuration.DeviceConfig) Collector {
 // BuildBatcher for Procurve
 func (p *deviceProcurve) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
-		{"continue", "a\n"},
-		{".*#", "no page\n"},
-		{".*#", "show running-config\n"},
+		{"continue", "a"},
+		{".*#", "no page"},
+		{".*#", "show running-config"},
 		{".*[\\S]#"},
 	})
 }

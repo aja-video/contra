@@ -22,9 +22,9 @@ func (p *devicePfsense) BuildBatcher() ([]expect.Batcher, error) {
 	// - So simply having .*root will match multiple times throughout the dump.
 	return utils.VariableBatcher([][]string{
 		{`</pfsense>`}, // Found the "OK" result!
-		{`Enter an option: `, "8\n"},
-		{`/root.*:`, "cat /conf/config.xml\n"},
-		{`\$ `, "cat /conf/config.xml\n"},
+		{`Enter an option: `, "8"},
+		{`/root.*:`, "cat /conf/config.xml"},
+		{`\$ `, "cat /conf/config.xml"},
 	})
 }
 
