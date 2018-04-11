@@ -79,7 +79,7 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 		// Close the connection if collection fails
 		closeErr := connection.Close()
 		if closeErr != nil {
-			log.Printf("Unable to close SSH connection %v", closeErr)
+			log.Printf("WARNING: Unable to close SSH connection for device %s %s\n", device.Name, closeErr.Error())
 		}
 		// return the collection error
 		return cw.collectFailure(device, err)
@@ -91,8 +91,7 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	// Close ssh connection
 	err = connection.Close()
 	if err != nil {
-		// TODO: Should this be fatal/return?
-		log.Printf("Error closing SSH Connection for %s: %v\n", device.Name, err)
+		log.Printf("WARNING: Error closing SSH Connection for %s: %s\n", device.Name, err.Error())
 	}
 	// Grab just the last result.
 	lastResult := result[len(result)-1].Output
