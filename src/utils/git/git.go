@@ -4,6 +4,7 @@ import (
 	"contra/src/configuration"
 	"contra/src/utils"
 	"gopkg.in/src-d/go-git.v4"
+	gitSsh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"log"
 	"strings"
 )
@@ -54,7 +55,14 @@ func GitOps(c *configuration.Config) error {
 		//TODO: Diffs
 		// push to remote if configured
 		if repo.Remote {
-			err = repo.Repo.Push(&git.PushOptions{})
+			auth, err := gitSSHAuth(c)
+			if err != nil {
+				return err
+			}
+			err = repo.Repo.Push(&git.PushOptions{Auth: auth})
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return err
@@ -82,4 +90,11 @@ func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error
 	}
 
 	return nil
+}
+
+// gitSSHAuth sets up authentication for git a git remote
+func gitSSHAuth(c *configuration.Config) (gitSsh.AuthMethod, error) {
+	auth, err := gitSsh.NewPublicKeysFromFile(c.GitUser, c.GitPrivateKey, "")
+	return auth, err
+
 }
