@@ -4,16 +4,16 @@ import (
 	"contra/src/configuration"
 	"contra/src/utils"
 	"gopkg.in/src-d/go-git.v4"
+	gitSsh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"log"
 	"strings"
 )
 
 // Git holds git repo data
 type Git struct {
-	Repo   *git.Repository
-	Path   string
-	Remote bool
-	url    string
+	Repo *git.Repository
+	Path string
+	url  string
 }
 
 // GitOps does stuff with git
@@ -22,8 +22,6 @@ func GitOps(c *configuration.Config) error {
 	// Set up git instance
 	repo := new(Git)
 	repo.Path = c.Workspace
-	// Determine if we are going to do a git push
-	repo.Remote = c.GitPush
 
 	// Open Repo for use by Contra
 	err := GitOpen(repo)
@@ -53,8 +51,15 @@ func GitOps(c *configuration.Config) error {
 		}
 		//TODO: Diffs
 		// push to remote if configured
-		if repo.Remote {
-			err = repo.Repo.Push(&git.PushOptions{})
+		if c.GitPush {
+			auth, err := gitSSHAuth(c)
+			if err != nil {
+				return err
+			}
+			err = repo.Repo.Push(&git.PushOptions{Auth: auth})
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return err
@@ -82,4 +87,11 @@ func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error
 	}
 
 	return nil
+}
+
+// gitSSHAuth sets up authentication for git a git remote
+func gitSSHAuth(c *configuration.Config) (gitSsh.AuthMethod, error) {
+	auth, err := gitSsh.NewPublicKeysFromFile(c.GitUser, c.GitPrivateKey, "")
+	return auth, err
+
 }
