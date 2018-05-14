@@ -83,7 +83,6 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	case <-clientConnected:
 		break
 	case <-time.After(10 * time.Second):
-		device.Disabled = true
 		return cw.collectFailure(device, errors.New("SSH Client timeout"))
 	}
 
