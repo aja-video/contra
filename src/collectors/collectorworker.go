@@ -3,6 +3,8 @@ package collectors
 import (
 	"contra/src/configuration"
 	"contra/src/utils"
+	"errors"
+	"golang.org/x/crypto/ssh"
 	"log"
 	"strconv"
 	"strings"
@@ -47,7 +49,8 @@ func (cw *CollectorWorker) RunCollectors() {
 // Run the collector for this device.
 func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	log.Printf("Collect Start: %s\n", device.Name)
-
+	var connection *ssh.Client
+	var err error
 	collector, _ := MakeCollector(device)
 
 	batchSlice, _ := collector.BuildBatcher()
@@ -69,7 +72,20 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 		s.Ciphers = strings.Split(device.Ciphers, ",")
 	}
 
-	connection, err := utils.SSHClient(*s)
+	// handle client timeouts
+	clientConnected := make(chan struct{})
+	go func() {
+		connection, err = utils.SSHClient(*s)
+		close(clientConnected)
+	}()
+	// wait for client
+	select {
+	case <-clientConnected:
+		break
+	case <-time.After(10 * time.Second):
+		return cw.collectFailure(device, errors.New("SSH Client timeout"))
+	}
+
 	if err != nil {
 		return cw.collectFailure(device, err)
 	}
