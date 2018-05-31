@@ -10,7 +10,13 @@ binaries: staging clean linux64
 
 linux64:
 	@echo -----linux64-----
-	GOOS=linux GOARCH=amd64 go build -o bin/$(BINARY) contra.go
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/$(BINARY) contra.go
+
+release: binaries compress rpm64 deb64
+
+compress:
+	@echo -----compress-----
+	upx --brute bin/$(BINARY)
 
 packages: binaries rpm64 deb64
 
