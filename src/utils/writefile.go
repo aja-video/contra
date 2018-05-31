@@ -2,8 +2,10 @@ package utils
 
 import (
 	"contra/src/configuration"
+	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 )
 
 // WriteFile saves output to a file
@@ -36,4 +38,11 @@ func workspaceExists(c configuration.Config) error {
 	err := os.Mkdir(c.Workspace, os.ModePerm)
 
 	return err
+}
+
+// WriteRunResult will write the count value into the runresult.log file and update the timestamp each run.
+func WriteRunResult(count int) error {
+	name := "runresult.log"
+	d1 := []byte(strconv.Itoa(count))
+	return ioutil.WriteFile(name, d1, 0644)
 }

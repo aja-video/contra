@@ -5,6 +5,7 @@ build/
 
 # Config file
 contra.conf
+runresult.log
 
 # TODO: Remove after verified none existing.
 devices.conf
