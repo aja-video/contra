@@ -30,6 +30,7 @@ type Config struct {
 
 	// User Settings
 	Workspace   string
+	RunResult   string
 	DefaultUser string
 	DefaultPass string
 

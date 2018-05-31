@@ -41,8 +41,7 @@ func workspaceExists(c configuration.Config) error {
 }
 
 // WriteRunResult will write the count value into the runresult.log file and update the timestamp each run.
-func WriteRunResult(count int) error {
-	name := "runresult.log"
+func WriteRunResult(filename string, count int) error {
 	d1 := []byte(strconv.Itoa(count))
-	return ioutil.WriteFile(name, d1, 0644)
+	return ioutil.WriteFile(filename, d1, 0644)
 }

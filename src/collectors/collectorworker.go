@@ -47,7 +47,7 @@ func (cw *CollectorWorker) RunCollectors() {
 	// reduce this number in the case of an expired ssh timer failure. We may want to.
 	// Display the completed collections, and write to run result file.
 	log.Printf("Completed collections: %d\n", len(cw.RunConfig.Devices))
-	err := utils.WriteRunResult(len(cw.RunConfig.Devices))
+	err := utils.WriteRunResult(cw.RunConfig.RunResult, len(cw.RunConfig.Devices))
 	if err != nil {
 		// If we fail to write the file, we display a note, but do not worry about it here.
 		// In theory, a monitoring application (Check MK) will notice the problem.
