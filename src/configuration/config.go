@@ -65,6 +65,7 @@ type DeviceConfig struct {
 	Type           string
 	User           string
 	Pass           string
+	UnlockPass     string // UnlockPass is used to access xtd-cli-mode on certain hp/comware devices.
 	Port           int
 	Ciphers        string
 	Disabled       bool

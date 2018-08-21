@@ -6,9 +6,9 @@ network device configurations.
 
 ### Features
 
-- Automated configuration watching for all supported network devices.
-- Tracks changes in GIT.
-- Review status and download config files via web portal.
+* Automated configuration watching for all supported network devices.
+* Tracks changes in GIT.
+* Review status and download config files via web portal.
 
 ## Installation
 
@@ -21,25 +21,26 @@ After the initial build, `make run` or `make` then execute `./bin/contra` will w
 
 ## Dependency Management
 
-- `dep` is used for dependency tracking
-- See https://golang.github.io/dep/docs/installation.html
+* `dep` is used for dependency tracking
+* See https://golang.github.io/dep/docs/installation.html
 
 ## Supported Devices
 
 ### Current
 
-- pfSense
-- Cisco Small Business
-- Vyataa
-- HP/Procurve
-- HP/Comware
+* pfSense
+* Cisco Small Business
+* Vyataa
+* HP/Procurve
+* HP/Comware
+    * For locked down devices use UnlockPass in the device configuration to unlock xtd-cli-mode
 
 ### Soon
 
 ### Someday
 
-- Cisco
-- Juniper (JunOS)
+* Cisco
+* Juniper (JunOS)
 
 ## Device Configuration
 
@@ -62,5 +63,5 @@ Contra is licensed under the MIT License
 
 ## Acknowledgements
 
-- This project was inspired by Splendid, Sweet, and Rancid.
+* This project was inspired by Splendid, Sweet, and Rancid.
 
