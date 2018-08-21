@@ -3,8 +3,8 @@ package collectors
 import (
 	"contra/src/configuration"
 	"contra/src/utils"
-	"fmt"
 	"github.com/google/goexpect"
+	"log"
 	"regexp"
 )
 
@@ -47,7 +47,7 @@ func (p *deviceComware) ParseResult(result string) (string, error) {
 // ModifySSHConfig to add ciphers for locked down comware devices - Aruba 1950 for example
 func (p *deviceComware) ModifySSHConfig(config *utils.SSHConfig) {
 	if len(p.UnlockPass) > 0 {
-		fmt.Println("Including ciphers for comware with xtd-cli-mode")
+		log.Println("Including ciphers for comware with xtd-cli-mode")
 		config.Ciphers = []string{"aes128-cbc", "aes256-cbc", "3des-cbc", "des-cbc"}
 	}
 }
