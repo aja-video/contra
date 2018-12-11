@@ -114,7 +114,6 @@ func (a *Application) StandardRun() {
 	if err != nil {
 		log.Printf("WARNING: Error encountered during GIT operations: %v\n", err)
 	}
-
 }
 
 // RunDaemon will persist and run collectors at the configured interval
