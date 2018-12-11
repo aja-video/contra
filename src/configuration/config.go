@@ -26,7 +26,10 @@ type Config struct {
 	Daemonize         bool
 
 	// Git
-	GitPush bool
+	GitPush       bool
+	GitAuth       bool
+	GitUser       string
+	GitPrivateKey string
 
 	// User Settings
 	Workspace   string
@@ -52,10 +55,6 @@ type Config struct {
 
 	// Devices
 	Devices []DeviceConfig
-	// SSH key for GIT
-	GitPrivateKey string
-	// User for GIT
-	GitUser string
 }
 
 // DeviceConfig holds the device specific settings.
@@ -95,7 +94,8 @@ func getConfigDefaults() *Config {
 		SMTPHost:         "smtphost",
 		SMTPPort:         25,
 		HTTPListen:       "localhost:5002",
-		GitPrivateKey:    ".ssh/id_rsa",
+		GitAuth:          true,
 		GitUser:          "git",
+		GitPrivateKey:    ".ssh/id_rsa",
 	}
 }

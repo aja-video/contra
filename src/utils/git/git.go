@@ -45,13 +45,17 @@ func GitOps(c *configuration.Config) error {
 		if err != nil {
 			return err
 		}
+		log.Println("GIT changes committed.")
+
 		err = gitSendEmail(c, changesOut, changedFiles)
 		if err != nil {
-			return err
+			// Log the error, but carry on.
+			log.Printf("WARNING: GIT notification email error: %v\n", err)
 		}
-		//TODO: Diffs
+
 		// push to remote if configured
 		if c.GitPush {
+			// If private key file is set, init public key auth.
 			auth, err := gitSSHAuth(c)
 			if err != nil {
 				return err
@@ -60,8 +64,10 @@ func GitOps(c *configuration.Config) error {
 			if err != nil {
 				return err
 			}
+			log.Println("GIT Push successful.")
 		}
 	}
+
 	return err
 }
 
@@ -91,6 +97,11 @@ func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error
 
 // gitSSHAuth sets up authentication for git a git remote
 func gitSSHAuth(c *configuration.Config) (gitSsh.AuthMethod, error) {
+	// If auth is disabled, there is nothing to do here.
+	if !c.GitAuth {
+		return nil, nil
+	}
+
 	auth, err := gitSsh.NewPublicKeysFromFile(c.GitUser, c.GitPrivateKey, "")
 	return auth, err
 
