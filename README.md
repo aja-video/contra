@@ -17,7 +17,7 @@ always go wrong.
 ## Installation
 
 ```
-git clone gitlab.aja.com/go/contra
+git clone git@github.com:aja-video/contra.git
 make first
 ```
 
