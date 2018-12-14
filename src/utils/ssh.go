@@ -26,13 +26,13 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 	case "KeyboardInteractive":
 		sshAuth = ssh.KeyboardInteractive(c.sshInteractive)
 		break
-	case "PublicKeys": // TODO: Test this
+	case "PublicKeys":
 		sshAuth = c.sshPublicKeys()
 		break
-	// default to password auth
 	case "Password":
 		sshAuth = ssh.Password(c.Pass)
 		break
+	// fail on unrecognized method
 	default:
 		return nil, fmt.Errorf("unrecognized SSH Authentication method: %s", c.AuthMethod)
 	}
