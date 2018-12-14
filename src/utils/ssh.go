@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"log"
@@ -29,9 +30,11 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 		sshAuth = c.sshPublicKeys()
 		break
 	// default to password auth
-	default:
+	case "Password":
 		sshAuth = ssh.Password(c.Pass)
 		break
+	default:
+		return nil, fmt.Errorf("unrecognized SSH Authentication method: %s", c.AuthMethod)
 	}
 
 	config := &ssh.ClientConfig{
