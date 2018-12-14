@@ -74,6 +74,9 @@ type DeviceConfig struct {
 	FailChan chan bool
 	// Number of failures to trigger an alert. A value of 0 disables alerts
 	FailureWarning int
+	// SSH Auth method
+	SSHAuthMethod string
+	SSHPrivateKey string
 }
 
 // GetName provides a simple implementation for the Collector interface.
