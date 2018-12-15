@@ -64,12 +64,13 @@ You can set GitAuth to false and it is effectively a `git push` from the workspa
 * HP/Procurve
 * HP/Comware
     * For locked down devices use UnlockPass in the device configuration to unlock xtd-cli-mode
+* Arista
 
 ### Soon
 
 * Cisco
 * Juniper (JunOS)
-* Arista
+
 
 ### Someday
 
