@@ -1,22 +1,20 @@
 package configuration
 
 import (
+	"fmt"
 	"github.com/go-ini/ini"
-	"log"
 )
 
-func mergeConfigFile(config *Config, filePath string) {
+func mergeConfigFile(config *Config, filePath string) error {
 	iniFile, err := ini.Load(filePath)
 	if err != nil {
-		log.Println(filePath)
-		panic(err) // Critical....
-		//return nil, err
+		return err
 	}
 
 	// Map [main] to config.
 	err = iniFile.Section("main").MapTo(config)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// Map/Load Device Configs
@@ -25,11 +23,13 @@ func mergeConfigFile(config *Config, filePath string) {
 			continue
 		}
 		if !section.HasKey("Type") {
-			log.Panicf("Device [%v] must have a type defined.", section.Name())
+			return fmt.Errorf("device [%v] must have a type defined", section.Name())
 		}
+
 		deviceConfig := DeviceConfig{
 			FailureWarning: 5,
 		}
+
 		section.MapTo(&deviceConfig)
 		// Copy the section name into the device config for reference.
 		deviceConfig.Name = section.Name()
@@ -39,4 +39,5 @@ func mergeConfigFile(config *Config, filePath string) {
 		}
 		config.Devices = append(config.Devices, deviceConfig)
 	}
+	return nil
 }

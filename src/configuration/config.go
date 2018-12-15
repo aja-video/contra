@@ -11,6 +11,7 @@ type Config struct {
 	Copyrights bool
 	Quiet      bool
 	Version    bool
+	ConfigTest bool
 
 	// Config
 	ConfigFile       string

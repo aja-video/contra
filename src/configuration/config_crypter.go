@@ -14,15 +14,14 @@ import (
 )
 
 // EncryptConfigFile will encrypt all the passwords in the full file.
-func EncryptConfigFile(filePath string) {
+func EncryptConfigFile(filePath string) error {
 	saveRequired := false
 
 	log.Println("ENCRYPT: Checking file: " + filePath)
 	iniFile, err := ini.Load(filePath)
 	if err != nil {
-		log.Println("ENCRYPT: Failed to load: " + filePath)
-		panic(err) // Critical....
-		//return nil, err
+		log.Println("ENCRYPT: Failed to load: " + filePath + err.Error())
+		return err
 	}
 
 	// Find or create a config key.
@@ -31,7 +30,8 @@ func EncryptConfigFile(filePath string) {
 		keyNew := make([]byte, 32)
 		_, err := rand.Read(keyNew)
 		if err != nil {
-			panic(err) // TODO...
+			log.Println("ENCRYPT: Failed to generate key: " + err.Error())
+			return err
 		}
 
 		// Store it
@@ -49,7 +49,11 @@ func EncryptConfigFile(filePath string) {
 			if strings.Contains(key.Name(), "Pass") {
 				if !strings.Contains(key.Value(), "~~contra~~") {
 					log.Printf("ENCRYPT: Pass Key Found - S: %s K: %s\n", section.Name(), key.Name())
-					key.SetValue("~~contra~~" + encryptConfig(encryptKey, key.Value()))
+					encryptedKey, err := encryptConfig(encryptKey, key.Value())
+					if err != nil {
+						return err
+					}
+					key.SetValue("~~contra~~" + encryptedKey)
 					saveRequired = true
 				}
 			}
@@ -72,9 +76,10 @@ func EncryptConfigFile(filePath string) {
 	}
 
 	log.Println("ENCRYPT: Done with file: " + filePath)
+	return nil
 }
 
-func decryptLoadedConfig(config *Config) {
+func decryptLoadedConfig(config *Config) error {
 	// Checks all struct fields. Requiring the prefix means it only applies to top level values.
 	v := reflect.ValueOf(config).Elem()
 	for i := 0; i < v.NumField(); i++ {
@@ -83,7 +88,11 @@ func decryptLoadedConfig(config *Config) {
 		if strings.HasPrefix(val, "~~contra~~") {
 			// Need to decide...
 			val = strings.Replace(val, "~~contra~~", "", 1)
-			v.Field(i).SetString(decryptConfig(config.EncryptKey, val))
+			encryptedValue, err := decryptConfig(config.EncryptKey, val)
+			if err != nil {
+				return err
+			}
+			v.Field(i).SetString(encryptedValue)
 		}
 	}
 
@@ -96,16 +105,21 @@ func decryptLoadedConfig(config *Config) {
 			if strings.HasPrefix(val, "~~contra~~") {
 				// Need to decode...
 				val = strings.Replace(val, "~~contra~~", "", 1)
-				v.Field(i).SetString(decryptConfig(config.EncryptKey, val))
+				encryptedValue, err := decryptConfig(config.EncryptKey, val)
+				if err != nil {
+					return err
+				}
+				v.Field(i).SetString(encryptedValue)
 			}
 		}
 
 		// Seems like brute forcing reflection in a bad way, but this works!
 		config.Devices[id] = v.Interface().(DeviceConfig)
 	}
+	return nil
 }
 
-func encryptConfig(key, value string) string {
+func encryptConfig(key, value string) (string, error) {
 	// This forces the byte array length to 32.
 	// The extra 0 padding is fine for our needs.
 	keyByte := make([]byte, 32)
@@ -114,7 +128,7 @@ func encryptConfig(key, value string) string {
 	return encryptSimple(keyByte, value)
 }
 
-func decryptConfig(key, value string) string {
+func decryptConfig(key, value string) (string, error) {
 	// This forces the byte array length to 32.
 	// The extra 0 padding is fine for our needs.
 	keyByte := make([]byte, 32)
@@ -125,13 +139,14 @@ func decryptConfig(key, value string) string {
 
 // EncryptSimple string to base64 crypto using AES
 // - Concept from: https://gist.github.com/manishtpatel/8222606
-func encryptSimple(key []byte, text string) string {
+func encryptSimple(key []byte, text string) (string, error) {
 	// key := []byte(keyText)
 	plaintext := []byte(text)
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		log.Println("ENCRYPT: Failed to encrypt: " + err.Error())
+		return "", err
 	}
 
 	// The IV needs to be unique, but not secure. Therefore it's common to
@@ -139,29 +154,32 @@ func encryptSimple(key []byte, text string) string {
 	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
+		log.Println("ENCRYPT: Failed to encrypt: " + err.Error())
+		return "", err
 	}
 
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
 
 	// convert to base64
-	return base64.URLEncoding.EncodeToString(ciphertext)
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
 // DecryptSimple from base64 to decrypted string
-func decryptSimple(key []byte, cryptoText string) string {
+func decryptSimple(key []byte, cryptoText string) (string, error) {
 	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		log.Println("DECRYPT: Failure decrypting item: " + err.Error())
+		return "", err
 	}
 
 	// The IV needs to be unique, but not secure. Therefore it's common to
 	// include it at the beginning of the ciphertext.
 	if len(ciphertext) < aes.BlockSize {
-		panic("ciphertext too short")
+		log.Println("DECRYPT: Failure decrypting item: ciphertext too short")
+		return "", fmt.Errorf("ciphertext too short: %v", len(ciphertext))
 	}
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
@@ -171,5 +189,5 @@ func decryptSimple(key []byte, cryptoText string) string {
 	// XORKeyStream can work in-place if the two arguments are the same.
 	stream.XORKeyStream(ciphertext, ciphertext)
 
-	return fmt.Sprintf("%s", ciphertext)
+	return fmt.Sprintf("%s", ciphertext), nil
 }
