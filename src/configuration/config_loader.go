@@ -2,9 +2,9 @@ package configuration
 
 import (
 	"log"
+	"os"
 	"sync"
 	"time"
-	"os"
 )
 
 // ConfigLoader - Orchestrates the configuration loading.
@@ -55,7 +55,6 @@ func loadConfig() *Config {
 			os.Exit(0)
 		}
 	}
-
 
 	// Sanity Check
 	if config.Interval < time.Second {
