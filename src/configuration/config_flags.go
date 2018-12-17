@@ -12,7 +12,7 @@ func parseConfigFlags() {
 
 	// TODO: "v" is declared by glog, do we want to use that?
 	//flag.Bool("v", true, "Display additional output details.")
-	
+
 	// Add reminder that we're not currently using this.
 	flag.Lookup("v").Usage = "log level for V logs (not currently used)"
 
