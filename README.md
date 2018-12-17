@@ -15,13 +15,8 @@ always go wrong.
 * Email notifications when a device is unable to be backed up.
 
 ## Installation
-
-```
-git clone git@github.com:aja-video/contra.git
-make first
-```
-
-After the initial build, `make run` or `make` then execute `./bin/contra` will work.
+* Linux packages (deb and rpm) - download the latest [release](https://github.com/aja-video/contra/releases)
+* or [build](#Building) from source
 
 ### Configuration
 
@@ -58,11 +53,6 @@ that any value which the system expects to be a bool, is actually a bool (true o
 A failing check will exit the application. A passing check will continue to run
 the application. Using the `-configtest` flag will exit even if the checks pass.
 
-## Dependency Management
-
-* `dep` is used for dependency tracking
-* See https://golang.github.io/dep/docs/installation.html
-
 ## Supported Devices
 
 ### Current
@@ -98,6 +88,7 @@ Pass="""Some#pass;word"""
 ```
 
 ## Building
+
 * Binary only: `make binaries`
 * Linux packages (.deb and .rpm) `make packages`
   * requires `fpm` - http://fpm.readthedocs.io/en/latest/installing.html
@@ -106,6 +97,11 @@ Pass="""Some#pass;word"""
   * requires `upx` - https://upx.github.io/
 * If you would like to build for another platform `GOOS=$platform GOARCH=$arch go build contra.go`
   * While Contra may work on platforms other than Linux it is untested.
+
+After the initial build, `make run` or `make` then execute `./bin/contra`
+
+#### Dependency Management
+* [Go 1.11 modules](https://github.com/golang/go/wiki/Modules) are used to manage dependencies
 
 ## Contributing
 
