@@ -18,8 +18,6 @@ always go wrong.
 * Linux packages (deb and rpm) - download the latest [release](https://github.com/aja-video/contra/releases)
 * or [build](#Building) from source
 
-After the initial build, `make run` or `make` then execute `./bin/contra` will work.
-
 ### Configuration
 
 Copy the `contra.example.conf` file to `contra.conf` and configure.
@@ -99,6 +97,8 @@ Pass="""Some#pass;word"""
   * requires `upx` - https://upx.github.io/
 * If you would like to build for another platform `GOOS=$platform GOARCH=$arch go build contra.go`
   * While Contra may work on platforms other than Linux it is untested.
+
+After the initial build, `make run` or `make` then execute `./bin/contra`
 
 #### Dependency Management
 * [Go 1.11 modules](https://github.com/golang/go/wiki/Modules) are used to manage dependencies
