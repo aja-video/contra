@@ -145,16 +145,18 @@ func encryptSimple(key []byte, text string) (string, error) {
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		log.Println("ENCRYPT: Failed to encrypt: " + err.Error())
+		log.Println("ENCRYPT: Failed to init cipher block: " + err.Error())
 		return "", err
 	}
 
 	// The IV needs to be unique, but not secure. Therefore it's common to
 	// include it at the beginning of the ciphertext.
 	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	// Declare slice the length of our block size to use as the initialization vector.
 	iv := ciphertext[:aes.BlockSize]
+	// Pull random data out of the native OS random number generator for our IV.
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		log.Println("ENCRYPT: Failed to encrypt: " + err.Error())
+		log.Println("ENCRYPT: Failed to read entropy for initialization vector: " + err.Error())
 		return "", err
 	}
 
