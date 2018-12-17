@@ -68,7 +68,9 @@ func loadConfig() *Config {
 	}
 
 	// Check and decrypt any passwords to the loaded in-memory config.
-	decryptLoadedConfig(config)
+	if err := decryptLoadedConfig(config); err != nil {
+		log.Fatalf("error decrypting configuration: %s", err.Error())
+	}
 
 	return config
 }
