@@ -1,9 +1,5 @@
 language: go
 
-branches:
-  only:
-    - dev-add-travis
-
 go:
   - "1.11.x"
   - master
