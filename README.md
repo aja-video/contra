@@ -49,6 +49,15 @@ You can set up the workspace folder's git repo with a remote origin, and set Git
 By default, GitAuth is also set to true, and will use `.ssh/id_rsa` private keypair to attempt the push.
 You can set GitAuth to false and it is effectively a `git push` from the workspace folder.
 
+#### Config Test
+
+Each time the application is started, a basic santiy check is run.
+It only ensures that all config keys match a real key name, as well as checks
+that any value which the system expects to be a bool, is actually a bool (true or false).
+
+A failing check will exit the application. A passing check will continue to run
+the application. Using the `-configtest` flag will exit even if the checks pass.
+
 ## Dependency Management
 
 * `dep` is used for dependency tracking
