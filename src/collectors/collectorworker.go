@@ -1,9 +1,9 @@
 package collectors
 
 import (
-	"contra/src/configuration"
-	"contra/src/utils"
 	"errors"
+	"github.com/aja-video/contra/src/configuration"
+	"github.com/aja-video/contra/src/utils"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strconv"

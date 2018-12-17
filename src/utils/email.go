@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"contra/src/configuration"
 	"errors"
+	"github.com/aja-video/contra/src/configuration"
 	"net/smtp"
 	"strconv"
 )

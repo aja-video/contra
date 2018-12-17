@@ -1,10 +1,10 @@
 package core
 
 import (
-	"contra/src/collectors"
-	"contra/src/configuration"
-	"contra/src/utils/git"
 	"fmt"
+	"github.com/aja-video/contra/src/collectors"
+	"github.com/aja-video/contra/src/configuration"
+	"github.com/aja-video/contra/src/utils/git"
 	"io/ioutil"
 	"log"
 	"os"

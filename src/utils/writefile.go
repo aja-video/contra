@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"contra/src/configuration"
+	"github.com/aja-video/contra/src/configuration"
 	"io/ioutil"
 	"log"
 	"os"
