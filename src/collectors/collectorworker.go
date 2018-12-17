@@ -142,14 +142,17 @@ func (cw *CollectorWorker) collectFailure(d configuration.DeviceConfig, err erro
 		d.FailChan <- true
 	} else if cap(d.FailChan) > 0 {
 		// Fire off an email if the warning queue is full and email is enabled
-		utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
+		_ = utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
 		// Empty the channel after we've reset a notification
 		for len(d.FailChan) > 0 {
 			<-d.FailChan
 		}
 	}
-	// log a warning
-	log.Printf("WARNING: Contra failed to gather configs from %s with error: %s\n", d.Name, err.Error())
+
+	// log a warning, reminder the matcher could be out of date, or incomplete.
+	log.Printf("WARNING: Contra failed to gather configs from %s with error: %s\n"+
+		"This can happen if the incorrect device type is selected, or if the device sends "+
+		"output that does not match the expected output.", d.Name, err.Error())
 
 	return err
 }

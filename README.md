@@ -1,4 +1,4 @@
-# Contra
+# Contra [![Build Status](https://travis-ci.com/aja-video/contra.svg?branch=master)](https://travis-ci.com/aja-video/contra) [![Go Report Card](https://goreportcard.com/badge/github.com/aja-video/contra)](https://goreportcard.com/report/github.com/aja-video/contra) [![GoDoc](https://godoc.org/github.com/aja-video/contra?status.svg)](https://godoc.org/github.com/aja-video/contra)
 
 AJA's network device configuration tracker software built using GoLang.
 Initially focused on routers and switches, but expected to track all

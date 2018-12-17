@@ -11,7 +11,10 @@ func parseConfigFlags() {
 	defaults := getConfigDefaults()
 
 	// TODO: "v" is declared by glog, do we want to use that?
-	//flag.Bool("v", defaults.Verbose, "Display additional output details.")
+	//flag.Bool("v", true, "Display additional output details.")
+
+	// Add reminder that we're not currently using this.
+	flag.Lookup("v").Usage = "log level for V logs (not currently used)"
 
 	flag.String("c", defaults.ConfigFile, "Config file name.")
 	flag.Int("p", defaults.Concurrency, "Parallel concurrent threads to use for collection.")
@@ -36,9 +39,31 @@ func parseConfigFlags() {
 // combined with the above function for defining and parsing
 // the flags. However, it is not apparent how to easily tell whether
 // a flag was explicitly set to a default value or not. Plus,
-// some other edge case considerations.
+// some other edge case considerations. The bool config map is to
+// reduce the cyclic complexity slightly. Wish the flags library would
+// have something built in, perhaps need to write a mapping class.
 func mergeConfigFlags(config *Config) {
+
+	boolConfigMap := map[string]*bool{
+		"d":          &config.Daemonize,
+		"dc":         &config.DisableCollection,
+		"debug":      &config.Debug,
+		"version":    &config.Version,
+		"x":          &config.AllowInsecureSSH,
+		"q":          &config.Quiet,
+		"e":          &config.EmailEnabled,
+		"w":          &config.WebserverEnabled,
+		"copyrights": &config.Copyrights,
+		"configtest": &config.ConfigTest,
+	}
+
 	flag.Visit(func(flagVal *flag.Flag) {
+		if val, ok := boolConfigMap[flagVal.Name]; ok {
+			// We found the value, dereference and assign.
+			*val = flagVal.Value.(flag.Getter).Get().(bool)
+			return
+		}
+
 		switch flagVal.Name {
 		// These should be in the same order that the flags above are declared.
 		case "c":
@@ -49,30 +74,10 @@ func mergeConfigFlags(config *Config) {
 			config.Interval = flagVal.Value.(flag.Getter).Get().(time.Duration)
 		case "t":
 			config.Timeout = flagVal.Value.(flag.Getter).Get().(time.Duration)
-		case "debug":
-			config.Debug = flagVal.Value.(flag.Getter).Get().(bool)
-		case "dc":
-			config.DisableCollection = flagVal.Value.(flag.Getter).Get().(bool)
-		case "x":
-			config.AllowInsecureSSH = flagVal.Value.(flag.Getter).Get().(bool)
-		case "q":
-			config.Quiet = flagVal.Value.(flag.Getter).Get().(bool)
-		case "e":
-			config.EmailEnabled = flagVal.Value.(flag.Getter).Get().(bool)
-		case "w":
-			config.WebserverEnabled = flagVal.Value.(flag.Getter).Get().(bool)
 		case "listen":
 			config.HTTPListen = flagVal.Value.(flag.Getter).Get().(string)
-		case "copyrights":
-			config.Copyrights = flagVal.Value.(flag.Getter).Get().(bool)
-		case "d":
-			config.Daemonize = flagVal.Value.(flag.Getter).Get().(bool)
-			// Fail if not defined.
-		case "version":
-			config.Version = flagVal.Value.(flag.Getter).Get().(bool)
-		case "configtest":
-			config.ConfigTest = flagVal.Value.(flag.Getter).Get().(bool)
 		default:
+			// Fail if not defined.
 			log.Fatalf("Flag merge not configured for %v", flagVal)
 		}
 	})
