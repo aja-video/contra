@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 	"time"
+	"os"
 )
 
 // ConfigLoader - Orchestrates the configuration loading.
@@ -38,10 +39,23 @@ func loadConfig() *Config {
 	config.ConfigFile = configPath
 
 	// Merge the config file params into the config.
-	mergeConfigFile(config, configPath)
+	if err := mergeConfigFile(config, configPath); err != nil {
+		log.Fatalf("Error loading config file: %s, %s", configPath, err.Error())
+	}
 
 	// Fetch flags and merge on top of file+default values.
 	mergeConfigFlags(config)
+
+	// Check for config test
+	if err := configTester(config.ConfigFile); err != nil {
+		log.Fatalf("Contra configuration test error: %s", err.Error())
+	} else {
+		log.Println("Contra configuration test passed")
+		if config.ConfigTest {
+			os.Exit(0)
+		}
+	}
+
 
 	// Sanity Check
 	if config.Interval < time.Second {
@@ -54,7 +68,9 @@ func loadConfig() *Config {
 	}
 
 	// Check and decrypt any passwords to the loaded in-memory config.
-	decryptLoadedConfig(config)
+	if err := decryptLoadedConfig(config); err != nil {
+		log.Fatalf("error decrypting configuration: %s", err.Error())
+	}
 
 	return config
 }

@@ -30,6 +30,7 @@ func parseConfigFlags() {
 	flag.Bool("copyrights", defaults.Copyrights, "Display copyright licenses of compiled packages.")
 	flag.Bool("d", defaults.Daemonize, "Run as Daemon")
 	flag.Bool("version", defaults.Version, "Display Contra version")
+	flag.Bool("configtest", defaults.ConfigTest, "Test Contra configuration")
 	flag.Parse()
 }
 
@@ -53,6 +54,7 @@ func mergeConfigFlags(config *Config) {
 		"e":          &config.EmailEnabled,
 		"w":          &config.WebserverEnabled,
 		"copyrights": &config.Copyrights,
+		"configtest": &config.ConfigTest,
 	}
 
 	flag.Visit(func(flagVal *flag.Flag) {
