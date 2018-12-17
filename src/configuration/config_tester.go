@@ -1,9 +1,9 @@
 package configuration
 
 import (
+	"fmt"
 	"github.com/go-ini/ini"
 	"reflect"
-	"fmt"
 )
 
 // configTester validates Contras configuration
@@ -65,7 +65,6 @@ func buildSectionMap(value reflect.Value, testMap map[string]int8) map[string]in
 		// set value to 1 for boolean so we can identify them
 		if value.Type().Field(i).Type.String() == "bool" {
 			testMap[key] = 1
-
 		} else {
 			testMap[key] = 2
 		}

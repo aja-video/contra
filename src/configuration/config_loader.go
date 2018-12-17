@@ -47,14 +47,15 @@ func loadConfig() *Config {
 	mergeConfigFlags(config)
 
 	// Check for config test
-	if config.ConfigTest {
-		if err := configTester(config.ConfigFile); err != nil {
-			log.Fatalf("Contra configuration test error: %s", err.Error())
-		} else {
-			log.Println("Contra configuration test passed")
+	if err := configTester(config.ConfigFile); err != nil {
+		log.Fatalf("Contra configuration test error: %s", err.Error())
+	} else {
+		log.Println("Contra configuration test passed")
+		if config.ConfigTest {
 			os.Exit(0)
 		}
 	}
+
 
 	// Sanity Check
 	if config.Interval < time.Second {
