@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const version = "1.0.2"
+const version = "1.0.50"
 
 // Application holds global application data and functions for kicking off execution.
 type Application struct {
