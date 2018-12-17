@@ -1,7 +1,7 @@
 package main
 
 import (
-	"contra/src/core"
+	"github.com/aja-video/contra/src/core"
 )
 
 func main() {
