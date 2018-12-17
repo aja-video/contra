@@ -29,6 +29,7 @@ func mergeConfigFile(config *Config, filePath string) {
 		}
 		deviceConfig := DeviceConfig{
 			FailureWarning: 5,
+			SSHAuthMethod:  "Password",
 		}
 		section.MapTo(&deviceConfig)
 		// Copy the section name into the device config for reference.

@@ -66,9 +66,11 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 
 	// Set up SSHConfig
 	s := &utils.SSHConfig{
-		User: device.User,
-		Pass: device.Pass,
-		Host: device.Host + ":" + strconv.Itoa(device.Port),
+		User:       device.User,
+		Pass:       device.Pass,
+		Host:       device.Host + ":" + strconv.Itoa(device.Port),
+		AuthMethod: device.SSHAuthMethod,
+		PrivateKey: device.SSHPrivateKey,
 	}
 
 	// Special case... only some collectors need to make some modifications.
