@@ -43,7 +43,9 @@ func (a *Application) Route() {
 		// Now that we have completely determined our configs (including command line flags)
 		// If we want to encrypt passwords, then kick it off before beginning normal execution.
 		if a.config.EncryptPasswords {
-			configuration.EncryptConfigFile(a.config.ConfigFile)
+			if err := configuration.EncryptConfigFile(a.config.ConfigFile); err != nil {
+				log.Fatalf("error encrypting config file %s: %s ",a.config.ConfigFile, err.Error())
+			}
 		}
 
 		// Normal execution, determine daemon or run once.
