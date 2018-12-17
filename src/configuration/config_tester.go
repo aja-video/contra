@@ -8,8 +8,6 @@ import (
 
 // configTester validates Contras configuration
 func configTester(configFile string) error {
-	var mainMap = make(map[string]int8)
-	var deviceMap = make(map[string]int8)
 	var err error
 
 	// load config file
@@ -21,12 +19,12 @@ func configTester(configFile string) error {
 	// Pull valid values for main configuration
 	mainConfig := Config{}
 	mainValues := reflect.ValueOf(&mainConfig).Elem()
-	mainMap = buildSectionMap(mainValues, deviceMap)
+	mainMap := buildSectionMap(mainValues, make(map[string]int8))
 
 	// Pull valid values for device configuration
 	deviceConfig := DeviceConfig{}
 	deviceValues := reflect.ValueOf(&deviceConfig).Elem()
-	deviceMap = buildSectionMap(deviceValues, deviceMap)
+	deviceMap := buildSectionMap(deviceValues, make(map[string]int8))
 
 	// iterate through ini sections and check them against valid config keys
 	for _, section := range iniFile.Sections() {
