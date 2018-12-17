@@ -1,9 +1,9 @@
 package collectors
 
 import (
-	"contra/src/configuration"
-	"contra/src/utils"
 	"fmt"
+	"github.com/aja-video/contra/src/configuration"
+	"github.com/aja-video/contra/src/utils"
 	"github.com/google/goexpect"
 )
 
