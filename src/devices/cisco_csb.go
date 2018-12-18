@@ -12,7 +12,7 @@ type DeviceCiscoCsb struct {
 	configuration.DeviceConfig
 }
 
-// SetConfig since it is unclear how to assign DeviceConfig via reflect.New
+// SetDeviceConfig since it is unclear how to assign DeviceConfig via reflect.New
 func (p *DeviceCiscoCsb) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
 	p.DeviceConfig = deviceConfig
 }

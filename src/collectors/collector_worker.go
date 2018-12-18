@@ -3,7 +3,6 @@ package collectors
 import (
 	"errors"
 	"github.com/aja-video/contra/src/configuration"
-	"github.com/aja-video/contra/src/devices"
 	"github.com/aja-video/contra/src/utils"
 	"golang.org/x/crypto/ssh"
 	"log"
@@ -16,16 +15,6 @@ import (
 type CollectorWorker struct {
 	RunConfig *configuration.Config
 	factory   CollectorFactory
-}
-
-// Mandatory that new collector definitions be added to this array.
-var deviceMap = map[string]interface{}{
-	"arista":    devices.DeviceArista{},
-	"cisco_csb": devices.DeviceCiscoCsb{},
-	"comware":   devices.DeviceComware{},
-	"pfsense":   devices.DevicePfsense{},
-	"procurve":  devices.DeviceProcurve{},
-	"vyatta":    devices.DeviceVyatta{},
 }
 
 // RunCollectors runs all collectors
