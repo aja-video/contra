@@ -72,6 +72,10 @@ func (c SSHConfig) sshInteractive(user, instruction string, questions []string, 
 // sshPublicKeys sets up Public Key auth for ssh
 func (c SSHConfig) sshPublicKeys() ssh.AuthMethod {
 	key, err := ioutil.ReadFile(c.PrivateKey)
+	if err != nil {
+		log.Println("Unable to read SSH pivate key, reverting to password authentication")
+		return ssh.Password(c.Pass)
+	}
 	privateKey, err := ssh.ParsePrivateKey(key)
 	if err != nil {
 		log.Println("Unable to parse SSH private key, reverting to password authentication")

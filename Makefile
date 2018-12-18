@@ -4,8 +4,6 @@ RPMDIR=rpm
 DEBDIR=deb
 all: test binaries
 
-first: deps test run
-
 binaries: staging clean linux64
 
 linux64:
@@ -28,8 +26,8 @@ rpm64: binaries
 	cp bin/$(BINARY) build/$(RPMDIR)/contra/usr/local/bin/
 	cp contra.example.conf build/$(RPMDIR)/contra/etc/contra.conf.dist
 	cp files/rpm/contra.service build/$(RPMDIR)/contra/etc/systemd/system/contra.service
-	fpm --description "Configuration Tracking for Network Devices" --url "https://gitlab.aja.com/go/contra" \
-		--license "mit" -m "it@aja.com" -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) \
+	fpm --description "Configuration Tracking for Network Devices" --url "https://github.com/aja-video/contra" \
+		--license "mit" -m "it@aja.com" -d git -p bin/ -s dir -t rpm -n contra -a x86_64 --epoch 0 -v $(VERSION) \
 		--before-install files/rpm/pre-install.sh --before-remove files/rpm/pre-remove.sh --after-install \
 		files/rpm/post-install.sh --after-remove files/rpm/post-remove.sh --after-upgrade files/rpm/after-upgrade.sh \
 		-C build/$(RPMDIR)/$(BINARY) .
@@ -40,8 +38,8 @@ deb64: binaries
 	cp bin/$(BINARY) build/$(DEBDIR)/contra/usr/local/bin/
 	mkdir -p build/$(DEBDIR)/contra/etc
 	cp contra.example.conf build/$(DEBDIR)/contra/etc/contra.conf.dist
-	fpm --description "Configuration Tracking for Network Devices" --url "https://gitlab.aja.com/go/contra" \
-		--license "mit" -m "it@aja.com" -p bin/ -s dir -t deb -n contra -a amd64 -v $(VERSION) -C build/$(DEBDIR)/$(BINARY) .
+	fpm --description "Configuration Tracking for Network Devices" --url "https://github.com/aja-video/contra" \
+		--license "mit" -m "it@aja.com" -d git -p bin/ -s dir -t deb -n contra -a amd64 -v $(VERSION) -C build/$(DEBDIR)/$(BINARY) .
 
 clean:
 	@echo -----clean-----
@@ -54,9 +52,6 @@ clean:
 staging:
 	@test -d bin ||mkdir bin
 	@test -d build ||mkdir build
-
-deps:
-	dep ensure -v
 
 fmt:
 	go fmt $(shell go list ./... | grep -v /vendor/)
@@ -75,5 +70,5 @@ run: linux64
 
 testrun: test run
 
-.PHONY: all clean deps fmt vet test run testrun staging
-.PHONY: binaries linux64 first
+.PHONY: all clean fmt vet test run testrun staging
+.PHONY: binaries linux64
