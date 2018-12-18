@@ -59,7 +59,9 @@ func loadConfig() *Config {
 	if err := configTester(config.ConfigFile); err != nil {
 		log.Fatalf("Contra configuration test error: %s", err.Error())
 	} else {
-		log.Println("Contra configuration test passed")
+		if !config.Quiet {
+			log.Println("Contra configuration test passed")
+		}
 		if config.ConfigTest {
 			os.Exit(0)
 		}

@@ -86,7 +86,7 @@ func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error
 	log.Printf("%s changed, sending email\n", strings.Join(changedFiles, ","))
 
 	// Send email with changes
-	err := utils.SendEmail(c, "Contra-Changes", changesString)
+	err := utils.SendEmail(c, c.EmailSubject, changesString)
 
 	if err != nil {
 		return err

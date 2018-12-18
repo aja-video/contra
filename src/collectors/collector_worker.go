@@ -23,6 +23,11 @@ func (cw *CollectorWorker) RunCollectors() {
 	// Create a channel with a maximum size of configured concurrency
 	queue := make(chan bool, cw.RunConfig.Concurrency)
 	for _, device := range cw.RunConfig.Devices {
+		// sanity check timeout
+		if device.SSHTimeout < time.Second {
+			log.Println("WARNING: SSH Timeout should be a minimum of 1s. Disabling device")
+			device.Disabled = true
+		}
 		if device.Disabled {
 			log.Printf("Config disabled: %v", device.Name)
 			continue
@@ -80,11 +85,13 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 
 	// Set up SSHConfig
 	s := &utils.SSHConfig{
-		User:       device.User,
-		Pass:       device.Pass,
-		Host:       device.Host + ":" + strconv.Itoa(device.Port),
-		AuthMethod: device.SSHAuthMethod,
-		PrivateKey: device.SSHPrivateKey,
+		User:          device.User,
+		Pass:          device.Pass,
+		Host:          device.Host + ":" + strconv.Itoa(device.Port),
+		AuthMethod:    device.SSHAuthMethod,
+		PrivateKey:    device.SSHPrivateKey,
+		AllowInsecure: device.AllowInsecureSSH,
+		SSHTimeout:    device.SSHTimeout,
 	}
 
 	// Special case... only some collectors need to make some modifications.
@@ -143,7 +150,12 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
-	return utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt")
+	if err := utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt"); err != nil {
+		log.Printf("Error saving config file: %s\n", err.Error())
+	}
+
+	return nil
+
 }
 
 // collectFailure handles collector failures

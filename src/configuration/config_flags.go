@@ -22,11 +22,7 @@ func parseConfigFlags() {
 	flag.Duration("t", defaults.Timeout, "Timeout default in seconds to wait for collection to finish.")
 	flag.Bool("q", defaults.Quiet, "Suppress most output except for problems or warnings.")
 	flag.Bool("debug", defaults.Debug, "Enable DEBUG flag for development.")
-	flag.Bool("x", defaults.AllowInsecureSSH, "Allow untrusted SSH keys.")
 	flag.Bool("e", defaults.EmailEnabled, "Enable or disable email when changes found.")
-	flag.Bool("dc", defaults.DisableCollection, "Disable collector processing.")
-	flag.Bool("w", defaults.WebserverEnabled, "Run a web status server.")
-	flag.String("listen", defaults.HTTPListen, "Host and port to use for HTTP status server.")
 	flag.Bool("copyrights", defaults.Copyrights, "Display copyright licenses of compiled packages.")
 	flag.Bool("d", defaults.Daemonize, "Run as Daemon")
 	flag.Bool("version", defaults.Version, "Display Contra version")
@@ -46,13 +42,10 @@ func mergeConfigFlags(config *Config) {
 
 	boolConfigMap := map[string]*bool{
 		"d":          &config.Daemonize,
-		"dc":         &config.DisableCollection,
 		"debug":      &config.Debug,
 		"version":    &config.Version,
-		"x":          &config.AllowInsecureSSH,
 		"q":          &config.Quiet,
 		"e":          &config.EmailEnabled,
-		"w":          &config.WebserverEnabled,
 		"copyrights": &config.Copyrights,
 		"configtest": &config.ConfigTest,
 	}
@@ -74,8 +67,6 @@ func mergeConfigFlags(config *Config) {
 			config.Interval = flagVal.Value.(flag.Getter).Get().(time.Duration)
 		case "t":
 			config.Timeout = flagVal.Value.(flag.Getter).Get().(time.Duration)
-		case "listen":
-			config.HTTPListen = flagVal.Value.(flag.Getter).Get().(string)
 		default:
 			// Fail if not defined.
 			log.Fatalf("Flag merge not configured for %v", flagVal)

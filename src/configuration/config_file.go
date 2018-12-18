@@ -3,6 +3,7 @@ package configuration
 import (
 	"fmt"
 	"github.com/go-ini/ini"
+	"time"
 )
 
 func mergeConfigFile(config *Config, filePath string) error {
@@ -27,8 +28,10 @@ func mergeConfigFile(config *Config, filePath string) error {
 		}
 
 		deviceConfig := DeviceConfig{
-			FailureWarning: 5,
-			SSHAuthMethod:  "Password",
+			FailureWarning:   5,
+			SSHAuthMethod:    "Password",
+			SSHTimeout:       10 * time.Second,
+			AllowInsecureSSH: true,
 		}
 
 		section.MapTo(&deviceConfig)

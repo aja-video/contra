@@ -10,12 +10,14 @@ import (
 
 //SSHConfig type to map SSH Configs
 type SSHConfig struct {
-	User       string
-	Pass       string
-	Host       string
-	Ciphers    []string
-	AuthMethod string
-	PrivateKey string
+	User          string
+	Pass          string
+	Host          string
+	Ciphers       []string
+	AuthMethod    string
+	PrivateKey    string
+	AllowInsecure bool
+	SSHTimeout    time.Duration
 }
 
 // SSHClient dials up our target device.
@@ -37,12 +39,20 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 		return nil, fmt.Errorf("unrecognized SSH Authentication method: %s", c.AuthMethod)
 	}
 
+	// build SSH config
 	config := &ssh.ClientConfig{
-		User:            c.User,
-		Auth:            []ssh.AuthMethod{sshAuth},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: this should be an option
-		Timeout:         time.Second * 10,            //TODO: this should be an option
+		User:    c.User,
+		Auth:    []ssh.AuthMethod{sshAuth},
+		Timeout: c.SSHTimeout,
 	}
+
+	if c.AllowInsecure {
+		config.HostKeyCallback = ssh.InsecureIgnoreHostKey()
+	} else {
+		return nil, fmt.Errorf("host key checking not yet implimented")
+		//config.HostKeyCallback = ssh.FixedHostKey(ssh.PublicKey(hostkey))
+	}
+
 	if c.Ciphers != nil {
 		config.Config = ssh.Config{
 			Ciphers: c.Ciphers,
