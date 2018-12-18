@@ -1,4 +1,4 @@
-package collectors
+package devices
 
 import (
 	"github.com/aja-video/contra/src/configuration"
