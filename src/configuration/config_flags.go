@@ -22,7 +22,6 @@ func parseConfigFlags() {
 	flag.Duration("t", defaults.Timeout, "Timeout default in seconds to wait for collection to finish.")
 	flag.Bool("q", defaults.Quiet, "Suppress most output except for problems or warnings.")
 	flag.Bool("debug", defaults.Debug, "Enable DEBUG flag for development.")
-	flag.Bool("x", defaults.AllowInsecureSSH, "Allow untrusted SSH keys.")
 	flag.Bool("e", defaults.EmailEnabled, "Enable or disable email when changes found.")
 	flag.Bool("dc", defaults.DisableCollection, "Disable collector processing.")
 	flag.Bool("w", defaults.WebserverEnabled, "Run a web status server.")
@@ -49,7 +48,6 @@ func mergeConfigFlags(config *Config) {
 		"dc":         &config.DisableCollection,
 		"debug":      &config.Debug,
 		"version":    &config.Version,
-		"x":          &config.AllowInsecureSSH,
 		"q":          &config.Quiet,
 		"e":          &config.EmailEnabled,
 		"w":          &config.WebserverEnabled,

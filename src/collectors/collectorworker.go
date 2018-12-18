@@ -66,11 +66,13 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 
 	// Set up SSHConfig
 	s := &utils.SSHConfig{
-		User:       device.User,
-		Pass:       device.Pass,
-		Host:       device.Host + ":" + strconv.Itoa(device.Port),
-		AuthMethod: device.SSHAuthMethod,
-		PrivateKey: device.SSHPrivateKey,
+		User:          device.User,
+		Pass:          device.Pass,
+		Host:          device.Host + ":" + strconv.Itoa(device.Port),
+		AuthMethod:    device.SSHAuthMethod,
+		PrivateKey:    device.SSHPrivateKey,
+		AllowInsecure: device.AllowInsecureSSH,
+		SSHTimeout:    device.SSHTimeout,
 	}
 
 	// Special case... only some collectors need to make some modifications.
@@ -126,7 +128,9 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
-	utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt")
+	if err := utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt"); err != nil {
+		log.Printf("Error saving config file: %s\n", err.Error())
+	}
 
 	return nil
 }

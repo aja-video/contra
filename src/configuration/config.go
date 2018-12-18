@@ -22,7 +22,6 @@ type Config struct {
 	Concurrency       int
 	Interval          time.Duration
 	Timeout           time.Duration
-	AllowInsecureSSH  bool
 	DisableCollection bool
 	Daemonize         bool
 
@@ -66,19 +65,19 @@ type DeviceConfig struct {
 	User string
 	Pass string
 	// UnlockPass is used to access xtd-cli-mode on certain hp/comware devices, or enable for Cisco/etc..
-	UnlockPass     string
-	Port           int
-	Ciphers        string
-	Disabled       bool
-	CustomTimeout  time.Duration
-	CommandTimeout time.Duration
+	UnlockPass string
+	Port       int
+	Ciphers    string
+	Disabled   bool
 	// Channel to track device collection failures
 	FailChan chan bool
 	// Number of failures to trigger an alert. A value of 0 disables alerts
 	FailureWarning int
-	// SSH Auth method
-	SSHAuthMethod string
-	SSHPrivateKey string
+	// SSH settings
+	SSHTimeout       time.Duration
+	SSHAuthMethod    string
+	SSHPrivateKey    string
+	AllowInsecureSSH bool
 }
 
 // GetName provides a simple implementation for the Collector interface.
@@ -96,6 +95,7 @@ func getConfigDefaults() *Config {
 		Timeout:          120 * time.Second,
 		Workspace:        "/workspace",
 		EmailSubject:     "Changes from Contra!",
+		EmailEnabled:     false,
 		SMTPHost:         "smtphost",
 		SMTPPort:         25,
 		HTTPListen:       "localhost:5002",
