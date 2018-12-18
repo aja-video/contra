@@ -103,6 +103,9 @@ After the initial build, `make run` or `make` then execute `./bin/contra`
 #### Dependency Management
 * [Go 1.11 modules](https://github.com/golang/go/wiki/Modules) are used to manage dependencies
 
+#### Testing
+* Using [golint](https://github.com/golang/lint) for code style `go get -u golang.org/x/lint/golint`
+
 ## Contributing
 
 If you have a device that is not yet supported, please review on of the existing devices and
