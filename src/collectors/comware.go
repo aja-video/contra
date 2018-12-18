@@ -8,15 +8,22 @@ import (
 	"regexp"
 )
 
-type DeviceComware interface {}
+type DeviceComware struct {
+	configuration.DeviceConfig
+}
+
+// SetConfig since it is unclear how to assign DeviceConfig via reflect.New
+func (p *DeviceComware) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
+	p.DeviceConfig = deviceConfig
+}
 
 // BuildBatcher for Comware
-func (p *DeviceComware) BuildBatcher(d configuration.DeviceConfig) ([]expect.Batcher, error) {
-	if len(d.UnlockPass) > 0 {
+func (p *DeviceComware) BuildBatcher() ([]expect.Batcher, error) {
+	if len(p.UnlockPass) > 0 {
 		return utils.SimpleBatcher([][]string{
 			{"<.*.>", "xtd-cli-mode"},
 			{`(\[Y\/N\]\:$)`, "Y"},
-			{"Password:", d.UnlockPass},
+			{"Password:", p.UnlockPass},
 			{"<.*.>", "screen-length disable"},
 			{"<.*.>", "display current-configuration"},
 			{"return"},

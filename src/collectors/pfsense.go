@@ -13,7 +13,7 @@ type DevicePfsense struct {
 
 // SetConfig since it is unclear how to assign DeviceConfig via reflect.New
 func (p *DevicePfsense) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
-	//p.DeviceConfig = deviceConfig
+	p.DeviceConfig = deviceConfig
 }
 
 // BuildBatcher for pfSense
