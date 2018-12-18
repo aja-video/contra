@@ -14,10 +14,12 @@ import (
 // CollectorWorker write me.
 type CollectorWorker struct {
 	RunConfig *configuration.Config
+	factory   collectorFactory
 }
 
 // RunCollectors runs all collectors
 func (cw *CollectorWorker) RunCollectors() {
+	cw.registerCollectors()
 	// Create a channel with a maximum size of configured concurrency
 	queue := make(chan bool, cw.RunConfig.Concurrency)
 	for _, device := range cw.RunConfig.Devices {
@@ -34,7 +36,10 @@ func (cw *CollectorWorker) RunCollectors() {
 		queue <- true
 		// Start collection process for each device
 		go func(config configuration.DeviceConfig) {
-			cw.Run(config)
+			err := cw.Run(config)
+			if err != nil {
+				log.Printf("Worker resulted in an error: %s\n", err.Error())
+			}
 			// Remove an element from the queue when the collection has finished
 			defer func() {
 				<-queue
@@ -65,9 +70,18 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	log.Printf("Collect Start: %s\n", device.Name)
 	var connection *ssh.Client
 	var err error
-	collector, _ := MakeCollector(device)
 
-	batchSlice, _ := collector.BuildBatcher()
+	// Initialize Collector
+	collector, err := cw.factory.MakeCollector(device.Type)
+	if err != nil {
+		return err
+	}
+	collector.SetDeviceConfig(device)
+
+	batchSlice, err := collector.BuildBatcher()
+	if err != nil {
+		return err
+	}
 
 	// Set up SSHConfig
 	s := &utils.SSHConfig{
@@ -129,7 +143,10 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	}
 	// Grab just the last result.
 	lastResult := result[len(result)-1].Output
-	parsed, _ := collector.ParseResult(lastResult)
+	parsed, err := collector.ParseResult(lastResult)
+	if err != nil {
+		return err
+	}
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
@@ -138,6 +155,7 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	}
 
 	return nil
+
 }
 
 // collectFailure handles collector failures
@@ -163,5 +181,13 @@ func (cw *CollectorWorker) collectFailure(d configuration.DeviceConfig, err erro
 		"This can happen if the incorrect device type is selected, or if the device sends "+
 		"output that does not match the expected output.", d.Name, err.Error())
 
-	return err
+	// We're logging it already, don't pass it further.
+	//return err
+	return nil
+}
+
+func (cw *CollectorWorker) registerCollectors() {
+	for name, device := range deviceMap {
+		cw.factory.Register(name, device)
+	}
 }

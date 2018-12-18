@@ -1,4 +1,4 @@
-package collectors
+package devices
 
 import (
 	"github.com/aja-video/contra/src/configuration"
@@ -7,17 +7,18 @@ import (
 	"regexp"
 )
 
-// deviceArista pulls the device config for an Arista device
-type deviceArista struct {
+// DeviceArista logic container for device.
+type DeviceArista struct {
 	configuration.DeviceConfig
 }
 
-func makeArista(d configuration.DeviceConfig) Collector {
-	return &deviceArista{d}
+// SetDeviceConfig since it is unclear how to assign DeviceConfig via reflect.New
+func (p *DeviceArista) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
+	p.DeviceConfig = deviceConfig
 }
 
 // BuildBatcher for Arista
-func (p *deviceArista) BuildBatcher() ([]expect.Batcher, error) {
+func (p *DeviceArista) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
 		{".*>", "terminal length 0"},
 		{".*>", "enable"},
@@ -28,7 +29,7 @@ func (p *deviceArista) BuildBatcher() ([]expect.Batcher, error) {
 }
 
 // ParseResult for Arista
-func (p *deviceArista) ParseResult(result string) (string, error) {
+func (p *DeviceArista) ParseResult(result string) (string, error) {
 
 	matcher := regexp.MustCompile(`![\s\S]*end`)
 	match := matcher.FindStringSubmatch(result)
