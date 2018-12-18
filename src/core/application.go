@@ -120,10 +120,14 @@ func (a *Application) StandardRun() {
 
 // RunDaemon will persist and run collectors at the configured interval
 func (a *Application) RunDaemon() {
-	interval := a.config.Interval
 	for {
+		// Reload Config
+		configuration.ReloadConfig()
+		a.config = configuration.GetConfig()
+		// Kick off the run.
 		a.StandardRun()
-		log.Printf("Collection finished, sleeping for %s\n", interval)
-		time.Sleep(interval)
+		// Sleep!
+		log.Printf("Collection finished, sleeping for %s\n", a.config.Interval)
+		time.Sleep(a.config.Interval)
 	}
 }

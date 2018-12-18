@@ -14,20 +14,29 @@ import (
 
 // Singleton pattern ensures a single config across concurrent threads.
 var instance *Config
-var once sync.Once
+var loadOnce sync.Once
+var parseOnce sync.Once
 
 // GetConfig is concurrency safe loading and retrieving of the config data.
 func GetConfig() *Config {
-	once.Do(func() {
+	loadOnce.Do(func() {
 		instance = loadConfig()
 	})
 	return instance
 }
 
+// ReloadConfig pulls the config in again, useful for making changes to a running service.
+func ReloadConfig() {
+	instance = loadConfig()
+}
+
 // loadConfig fetches the various sources of configuration data, and returns the fully prepared config.
 func loadConfig() *Config {
 	// Parse command line flags
-	parseConfigFlags()
+	parseOnce.Do(func() {
+		// We only want to parse (and define) the flags once.
+		parseConfigFlags()
+	})
 
 	// Pull a copy of the defaults, and convert to a pointer.
 	config := getConfigDefaults()
