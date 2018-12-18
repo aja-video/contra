@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
+	"github.com/google/goexpect"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strconv"
@@ -14,10 +15,21 @@ import (
 // CollectorWorker write me.
 type CollectorWorker struct {
 	RunConfig *configuration.Config
+	factory   CollectorFactory
+}
+
+// Mandatory that new collector definitions be added to this array.
+var deviceMap = map[string]interface{}{
+	"cisco_csb": DeviceCiscoCsb{},
+	"pfsense":   DevicePfsense{},
+	"vyatta":    DeviceVyatta{},
+	"comware":   DeviceComware{},
+	"procurve":  DeviceProcurve{},
 }
 
 // RunCollectors runs all collectors
 func (cw *CollectorWorker) RunCollectors() {
+	cw.registerCollectors()
 	// Create a channel with a maximum size of configured concurrency
 	queue := make(chan bool, cw.RunConfig.Concurrency)
 	for _, device := range cw.RunConfig.Devices {
@@ -60,9 +72,13 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	log.Printf("Collect Start: %s\n", device.Name)
 	var connection *ssh.Client
 	var err error
-	collector, _ := MakeCollector(device)
 
-	batchSlice, _ := collector.BuildBatcher()
+	// Initialize Collector
+	collector := cw.factory.MakeCollector(device.Type)
+	collector.SetDeviceConfig(device)
+
+	//batchSlice, _ := collector.BuildBatcher()
+	batchSlice := []expect.Batcher{}
 
 	// Set up SSHConfig
 	s := &utils.SSHConfig{
@@ -122,7 +138,8 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	}
 	// Grab just the last result.
 	lastResult := result[len(result)-1].Output
-	parsed, _ := collector.ParseResult(lastResult)
+	//parsed, _ := collector.ParseResult(lastResult)
+	parsed := lastResult
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
@@ -152,4 +169,10 @@ func (cw *CollectorWorker) collectFailure(d configuration.DeviceConfig, err erro
 	log.Printf("WARNING: Contra failed to gather configs from %s with error: %s\n", d.Name, err.Error())
 
 	return err
+}
+
+func (cw *CollectorWorker) registerCollectors() {
+	for name, device := range deviceMap {
+		cw.factory.Register(name, device)
+	}
 }

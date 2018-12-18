@@ -8,21 +8,15 @@ import (
 	"regexp"
 )
 
-type deviceComware struct {
-	configuration.DeviceConfig
-}
-
-func makeComware(d configuration.DeviceConfig) Collector {
-	return &deviceComware{d}
-}
+type DeviceComware interface {}
 
 // BuildBatcher for Comware
-func (p *deviceComware) BuildBatcher() ([]expect.Batcher, error) {
-	if len(p.UnlockPass) > 0 {
+func (p *DeviceComware) BuildBatcher(d configuration.DeviceConfig) ([]expect.Batcher, error) {
+	if len(d.UnlockPass) > 0 {
 		return utils.SimpleBatcher([][]string{
 			{"<.*.>", "xtd-cli-mode"},
 			{`(\[Y\/N\]\:$)`, "Y"},
-			{"Password:", p.UnlockPass},
+			{"Password:", d.UnlockPass},
 			{"<.*.>", "screen-length disable"},
 			{"<.*.>", "display current-configuration"},
 			{"return"},
@@ -36,7 +30,7 @@ func (p *deviceComware) BuildBatcher() ([]expect.Batcher, error) {
 }
 
 // ParseResult for Comware
-func (p *deviceComware) ParseResult(result string) (string, error) {
+func (p *DeviceComware) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
 	matcher := regexp.MustCompile(`#[\s\S]*?return`)
 	match := matcher.FindStringSubmatch(result)
@@ -45,7 +39,7 @@ func (p *deviceComware) ParseResult(result string) (string, error) {
 }
 
 // ModifySSHConfig to add ciphers for locked down comware devices - Aruba 1950 for example
-func (p *deviceComware) ModifySSHConfig(config *utils.SSHConfig) {
+func (p *DeviceComware) ModifySSHConfig(config *utils.SSHConfig) {
 	if len(p.UnlockPass) > 0 {
 		log.Println("Including ciphers for comware with xtd-cli-mode")
 		config.Ciphers = []string{"aes128-cbc", "aes256-cbc", "3des-cbc", "des-cbc"}

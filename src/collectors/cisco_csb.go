@@ -8,21 +8,21 @@ import (
 	"regexp"
 )
 
-// deviceCiscoCsb pulls the device config for a Cisco Small Business device.
-type deviceCiscoCsb struct {
+type DeviceCiscoCsb struct {
 	configuration.DeviceConfig
 }
 
-func makeCiscoCsb(d configuration.DeviceConfig) Collector {
-	return &deviceCiscoCsb{d}
+// SetConfig since it is unclear how to assign DeviceConfig via reflect.New
+func (p *DeviceCiscoCsb) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
+	p.DeviceConfig = deviceConfig
 }
 
 // BuildBatcher for CiscoCSB
 // This is assuming prompt for User Name on Cisco CSB - this may not always be the case
-func (p *deviceCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
+func (p *DeviceCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
-		{"User Name:", p.DeviceConfig.User},
-		{"Password:", p.DeviceConfig.Pass},
+		{"User Name:", p.User},
+		{"Password:", p.Pass},
 		{".*#", "terminal datadump"},
 		{".*#", "show running-config"},
 		{".*#"},
@@ -30,7 +30,7 @@ func (p *deviceCiscoCsb) BuildBatcher() ([]expect.Batcher, error) {
 }
 
 // ParseResult for CiscoCSB
-func (p *deviceCiscoCsb) ParseResult(result string) (string, error) {
+func (p *DeviceCiscoCsb) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
 	// This may break if there is a '#' in the config
 	matcher := regexp.MustCompile(`show.*[\s\S]\n(.*[\s\S]*)\n[\S.]*#`)
@@ -40,7 +40,7 @@ func (p *deviceCiscoCsb) ParseResult(result string) (string, error) {
 }
 
 // ModifySSHConfig since CiscoCSB needs special ciphers.
-func (p *deviceCiscoCsb) ModifySSHConfig(config *utils.SSHConfig) {
+func (p *DeviceCiscoCsb) ModifySSHConfig(config *utils.SSHConfig) {
 	log.Println("Including Ciphers for Cisco CSB.")
 
 	config.Ciphers = []string{"aes256-cbc", "aes128-cbc"}

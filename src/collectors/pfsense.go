@@ -7,16 +7,17 @@ import (
 	"regexp"
 )
 
-type devicePfsense struct {
+type DevicePfsense struct {
 	configuration.DeviceConfig
 }
 
-func makePfsense(d configuration.DeviceConfig) Collector {
-	return &devicePfsense{d}
+// SetConfig since it is unclear how to assign DeviceConfig via reflect.New
+func (p *DevicePfsense) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
+	//p.DeviceConfig = deviceConfig
 }
 
 // BuildBatcher for pfSense
-func (p *devicePfsense) BuildBatcher() ([]expect.Batcher, error) {
+func (p *DevicePfsense) BuildBatcher() ([]expect.Batcher, error) {
 	// The "OK" result must be the first entry for variable.
 	// The more the better, since this is constantly checking every case for a match.
 	// - So simply having .*root will match multiple times throughout the dump.
@@ -29,7 +30,7 @@ func (p *devicePfsense) BuildBatcher() ([]expect.Batcher, error) {
 }
 
 // ParseResult for pfSense
-func (p *devicePfsense) ParseResult(result string) (string, error) {
+func (p *DevicePfsense) ParseResult(result string) (string, error) {
 	// Strip shell commands, grab only the xml file
 	matcher := regexp.MustCompile(`<\?xml version[\s\S]*?<\/pfsense>`)
 	match := matcher.FindStringSubmatch(result)

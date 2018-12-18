@@ -1,7 +1,6 @@
 package collectors
 
 import (
-	"fmt"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
 	"github.com/google/goexpect"
@@ -9,6 +8,7 @@ import (
 
 // Collector interface keeps things together for collection.
 type Collector interface {
+	SetDeviceConfig(d configuration.DeviceConfig)
 	BuildBatcher() ([]expect.Batcher, error)
 	ParseResult(string) (string, error)
 }
@@ -16,23 +16,4 @@ type Collector interface {
 // CollectorSpecial is special.
 type CollectorSpecial interface {
 	ModifySSHConfig(config *utils.SSHConfig)
-}
-
-// MakeCollector will generate the appropriate collector based on the
-// type string passed in by the configuration.
-func MakeCollector(d configuration.DeviceConfig) (Collector, error) {
-	switch d.Type {
-	case "cisco_csb":
-		return makeCiscoCsb(d), nil
-	case "procurve":
-		return makeProcurve(d), nil
-	case "comware":
-		return makeComware(d), nil
-	case "pfsense":
-		return makePfsense(d), nil
-	case "vyatta":
-		return makeVyatta(d), nil
-	default:
-		return nil, fmt.Errorf("unrecognized collector type: %v", d.Type)
-	}
 }
