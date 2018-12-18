@@ -43,7 +43,7 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 	config := &ssh.ClientConfig{
 		User:    c.User,
 		Auth:    []ssh.AuthMethod{sshAuth},
-		Timeout: c.SSHTimeout * time.Second,
+		Timeout: c.SSHTimeout,
 	}
 
 	if c.AllowInsecure {

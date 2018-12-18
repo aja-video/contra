@@ -21,6 +21,11 @@ func (cw *CollectorWorker) RunCollectors() {
 	// Create a channel with a maximum size of configured concurrency
 	queue := make(chan bool, cw.RunConfig.Concurrency)
 	for _, device := range cw.RunConfig.Devices {
+		// sanity check timeout
+		if device.SSHTimeout < time.Second {
+			log.Println("WARNING: SSH Timeout should be a minimum of 1s. Disabling device")
+			device.Disabled = true
+		}
 		if device.Disabled {
 			log.Printf("Config disabled: %v", device.Name)
 			continue
