@@ -7,6 +7,7 @@ import (
 	"regexp"
 )
 
+// DevicePfsense logic container for device.
 type DevicePfsense struct {
 	configuration.DeviceConfig
 }

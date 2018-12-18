@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-// DeviceArista pulls the device config for an Arista device
+// DeviceArista logic container for device.
 type DeviceArista struct {
 	configuration.DeviceConfig
 }

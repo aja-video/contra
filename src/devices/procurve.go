@@ -7,6 +7,7 @@ import (
 	"regexp"
 )
 
+// DeviceProcurve logic container for device.
 type DeviceProcurve struct {
 	configuration.DeviceConfig
 }

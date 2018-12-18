@@ -8,6 +8,7 @@ import (
 	"regexp"
 )
 
+// DeviceComware logic container for device.
 type DeviceComware struct {
 	configuration.DeviceConfig
 }

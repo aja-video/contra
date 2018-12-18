@@ -14,7 +14,7 @@ import (
 // CollectorWorker write me.
 type CollectorWorker struct {
 	RunConfig *configuration.Config
-	factory   CollectorFactory
+	factory   collectorFactory
 }
 
 // RunCollectors runs all collectors

@@ -7,6 +7,7 @@ import (
 	"regexp"
 )
 
+// DeviceVyatta logic container for device.
 type DeviceVyatta struct {
 	configuration.DeviceConfig
 }

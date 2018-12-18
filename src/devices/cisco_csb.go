@@ -8,6 +8,7 @@ import (
 	"regexp"
 )
 
+// DeviceCiscoCsb logic container for device.
 type DeviceCiscoCsb struct {
 	configuration.DeviceConfig
 }
