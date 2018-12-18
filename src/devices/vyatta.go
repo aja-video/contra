@@ -1,4 +1,4 @@
-package collectors
+package devices
 
 import (
 	"github.com/aja-video/contra/src/configuration"
@@ -7,17 +7,18 @@ import (
 	"regexp"
 )
 
-// deviceVyatta pulls the device config for a Vyatta based device.
-type deviceVyatta struct {
+// DeviceVyatta logic container for device.
+type DeviceVyatta struct {
 	configuration.DeviceConfig
 }
 
-func makeVyatta(d configuration.DeviceConfig) Collector {
-	return &deviceVyatta{d}
+// SetDeviceConfig since it is unclear how to assign DeviceConfig via reflect.New
+func (p *DeviceVyatta) SetDeviceConfig(deviceConfig configuration.DeviceConfig) {
+	p.DeviceConfig = deviceConfig
 }
 
 // BuildBatcher for Vyatta
-func (p *deviceVyatta) BuildBatcher() ([]expect.Batcher, error) {
+func (p *DeviceVyatta) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
 		{`.*\$`, "terminal length 0"},
 		{`.*\$`, "show configuration"},
@@ -26,7 +27,7 @@ func (p *deviceVyatta) BuildBatcher() ([]expect.Batcher, error) {
 }
 
 // ParseResult for Vyatta
-func (p *deviceVyatta) ParseResult(result string) (string, error) {
+func (p *DeviceVyatta) ParseResult(result string) (string, error) {
 	matcher := regexp.MustCompile(`(.*\{[\s\S]*\})\n[\S\s]*\$`)
 	match := matcher.FindStringSubmatch(result)
 	return match[1], nil
