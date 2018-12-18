@@ -40,14 +40,6 @@ func (a *Application) Route() {
 	} else if a.config.Version {
 		a.DisplayVersion()
 	} else {
-		// Now that we have completely determined our configs (including command line flags)
-		// If we want to encrypt passwords, then kick it off before beginning normal execution.
-		if a.config.EncryptPasswords {
-			if err := configuration.EncryptConfigFile(a.config.ConfigFile); err != nil {
-				log.Fatalf("error encrypting config file %s: %s ", a.config.ConfigFile, err.Error())
-			}
-		}
-
 		// Normal execution, determine daemon or run once.
 		if a.config.Daemonize {
 			// Repeat collectors every interval
@@ -107,7 +99,13 @@ func (a *Application) StandardRun() {
 	worker := collectors.CollectorWorker{
 		RunConfig: a.config,
 	}
-
+	// Now that we have completely determined our configs (including command line flags)
+	// If we want to encrypt passwords, then kick it off before beginning normal execution.
+	if a.config.EncryptPasswords {
+		if err := configuration.EncryptConfigFile(a.config.ConfigFile); err != nil {
+			log.Fatalf("error encrypting config file %s: %s ", a.config.ConfigFile, err.Error())
+		}
+	}
 	// Collect everything
 	worker.RunCollectors()
 
@@ -120,10 +118,14 @@ func (a *Application) StandardRun() {
 
 // RunDaemon will persist and run collectors at the configured interval
 func (a *Application) RunDaemon() {
-	interval := a.config.Interval
 	for {
+		// Reload Config
+		configuration.ReloadConfig()
+		a.config = configuration.GetConfig()
+		// Kick off the run.
 		a.StandardRun()
-		log.Printf("Collection finished, sleeping for %s\n", interval)
-		time.Sleep(interval)
+		// Sleep!
+		log.Printf("Collection finished, sleeping for %s\n", a.config.Interval)
+		time.Sleep(a.config.Interval)
 	}
 }
