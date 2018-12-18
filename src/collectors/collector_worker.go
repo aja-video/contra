@@ -20,11 +20,12 @@ type CollectorWorker struct {
 
 // Mandatory that new collector definitions be added to this array.
 var deviceMap = map[string]interface{}{
+	"arista":    devices.DeviceArista{},
 	"cisco_csb": devices.DeviceCiscoCsb{},
-	"pfsense":   devices.DevicePfsense{},
-	"vyatta":    devices.DeviceVyatta{},
 	"comware":   devices.DeviceComware{},
+	"pfsense":   devices.DevicePfsense{},
 	"procurve":  devices.DeviceProcurve{},
+	"vyatta":    devices.DeviceVyatta{},
 }
 
 // RunCollectors runs all collectors
