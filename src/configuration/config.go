@@ -19,11 +19,10 @@ type Config struct {
 	EncryptKey       string
 
 	// Collector Settings
-	Concurrency       int
-	Interval          time.Duration
-	Timeout           time.Duration
-	DisableCollection bool
-	Daemonize         bool
+	Concurrency int
+	Interval    time.Duration
+	Timeout     time.Duration
+	Daemonize   bool
 
 	// Git
 	GitPush       bool
@@ -32,10 +31,8 @@ type Config struct {
 	GitPrivateKey string
 
 	// User Settings
-	Workspace   string
-	RunResult   string
-	DefaultUser string
-	DefaultPass string
+	Workspace string
+	RunResult string
 
 	// Mail
 	EmailEnabled bool
@@ -48,10 +45,6 @@ type Config struct {
 	SMTPPort int
 	SMTPUser string
 	SMTPPass string
-
-	// Webserver
-	WebserverEnabled bool
-	HTTPListen       string
 
 	// Devices
 	Devices []DeviceConfig
@@ -98,7 +91,6 @@ func getConfigDefaults() *Config {
 		EmailEnabled:     false,
 		SMTPHost:         "smtphost",
 		SMTPPort:         25,
-		HTTPListen:       "localhost:5002",
 		GitAuth:          true,
 		GitUser:          "git",
 		GitPrivateKey:    ".ssh/id_rsa",

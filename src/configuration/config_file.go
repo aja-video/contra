@@ -28,9 +28,9 @@ func mergeConfigFile(config *Config, filePath string) error {
 		}
 
 		deviceConfig := DeviceConfig{
-			FailureWarning: 5,
-			SSHAuthMethod:  "Password",
-			SSHTimeout:     10 * time.Second,
+			FailureWarning:   5,
+			SSHAuthMethod:    "Password",
+			SSHTimeout:       10 * time.Second,
 			AllowInsecureSSH: true,
 		}
 
