@@ -2,7 +2,6 @@ package collectors
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 )
 
@@ -22,7 +21,7 @@ func (cf *collectorFactory) Register(name string, i interface{}) {
 	cf.registry[name] = t
 
 	// Debugging
-	log.Printf("Registered type: [ %s ] With alias: [ %s ]", t.Name(), name)
+	//log.Printf("Registered type: [ %s ] With alias: [ %s ]", t.Name(), name)
 }
 
 func (cf *collectorFactory) Make(typeName string) (interface{}, error) {
