@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"github.com/pmezard/go-difflib/difflib"
+	"io/ioutil"
+	"log"
 	"os/exec"
 )
 
@@ -25,6 +28,22 @@ func gitDiffExec(path, filename string) (string, error) {
 	return string(diff), err
 }
 
-func gitDiffNative() {
-	// Someday...
+// gitDiffNative returns a diff of the existing config and the collector output
+func gitDiffNative(path string, filename string, output string) string {
+	qualifiedFile := path + `/` + filename
+	oldFile, err := ioutil.ReadFile(qualifiedFile)
+	if err != nil {
+		log.Fatalf("Unable to open file %s\n", qualifiedFile)
+	}
+	diff := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(string(oldFile)),
+		B:        difflib.SplitLines(output),
+		FromFile: filename,
+		ToFile:   "Collector Output",
+		Context:  3,
+	}
+
+	changes, _ := difflib.GetUnifiedDiffString(diff)
+
+	return changes
 }
