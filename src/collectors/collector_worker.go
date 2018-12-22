@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
+	contraGit "github.com/aja-video/contra/src/utils/git"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strconv"
@@ -13,12 +14,14 @@ import (
 
 // CollectorWorker write me.
 type CollectorWorker struct {
-	RunConfig *configuration.Config
-	factory   collectorFactory
+	RunConfig      *configuration.Config
+	factory        collectorFactory
+	updatedConfigs []string
+	diffs          []string
 }
 
 // RunCollectors runs all collectors
-func (cw *CollectorWorker) RunCollectors() {
+func (cw *CollectorWorker) RunCollectors() ([]string, []string) {
 	cw.registerCollectors()
 	// Create a channel with a maximum size of configured concurrency
 	queue := make(chan bool, cw.RunConfig.Concurrency)
@@ -63,6 +66,7 @@ func (cw *CollectorWorker) RunCollectors() {
 		// In theory, a monitoring application (Check MK) will notice the problem.
 		log.Printf("Failed to write run result: %s\n", err.Error())
 	}
+	return cw.updatedConfigs, cw.diffs
 }
 
 // Run the collector for this device.
@@ -146,6 +150,15 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	parsed, err := collector.ParseResult(lastResult)
 	if err != nil {
 		return err
+	}
+	diff, err := contraGit.GitDiff(*cw.RunConfig, device.Name+".txt", parsed)
+	if err != nil {
+		log.Printf("error parsing changes in configuration for %s: %s\n", device.Name, err.Error())
+	}
+
+	if len(diff) > 0 {
+		cw.diffs = append(cw.diffs, diff)
+		cw.updatedConfigs = append(cw.updatedConfigs, device.Name)
 	}
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))

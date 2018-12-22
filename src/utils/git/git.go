@@ -41,17 +41,11 @@ func GitOps(c *configuration.Config) error {
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
-		changesOut, changedFiles, err := Commit(repo.Path, status, *worktree)
+		err := Commit(repo.Path, status, *worktree)
 		if err != nil {
 			return err
 		}
 		log.Println("GIT changes committed.")
-
-		err = gitSendEmail(c, changesOut, changedFiles)
-		if err != nil {
-			// Log the error, but carry on.
-			log.Printf("WARNING: GIT notification email error: %v\n", err)
-		}
 
 		// push to remote if configured
 		if c.GitPush {
@@ -71,8 +65,8 @@ func GitOps(c *configuration.Config) error {
 	return err
 }
 
-//gitSendEmail sends git related email notifications
-func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error {
+// GitSendEmail sends git related email notifications
+func GitSendEmail(c *configuration.Config, changes, changedFiles []string) error {
 
 	// Bail out if email is disabled
 	if !c.EmailEnabled {
