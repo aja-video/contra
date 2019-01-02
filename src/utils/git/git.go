@@ -58,7 +58,9 @@ func GitOps(c *configuration.Config) error {
 			// If private key file is set, init public key auth.
 			auth, err := gitSSHAuth(c)
 			if err != nil {
-				return err
+				log.Printf(`WARNING: Error establish GIT authentication: "%s" changes will not be pushed.`, err)
+				log.Printf(`WARNING: Verify GitAuth and GitPrivateKey configuration in %s`, c.ConfigFile)
+				return nil
 			}
 			err = repo.Repo.Push(&git.PushOptions{Auth: auth})
 			if err != nil {
