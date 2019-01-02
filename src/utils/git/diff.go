@@ -11,7 +11,7 @@ func GitDiff(workspace, filename string, output string) (string, error) {
 	qualifiedFile := workspace + `/` + filename
 	oldFile, err := ioutil.ReadFile(qualifiedFile)
 	if err != nil {
-		log.Printf("unable to open device configuration %s - assuming new config\n", qualifiedFile)
+		log.Printf("unable to open an existing device config file %s - assuming new device\n", qualifiedFile)
 		oldFile = nil
 	}
 	diff := difflib.UnifiedDiff{
