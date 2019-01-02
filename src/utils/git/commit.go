@@ -8,7 +8,7 @@ import (
 )
 
 // Commit will add and commit changes
-func Commit(path string, status git.Status, worktree git.Worktree) error {
+func Commit(status git.Status, worktree git.Worktree) error {
 	// Iterate over changed files to determine what is changed
 	for file, status := range status {
 

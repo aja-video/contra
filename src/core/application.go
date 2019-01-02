@@ -107,15 +107,7 @@ func (a *Application) StandardRun() {
 		}
 	}
 	// Collect everything
-	changedFiles, diffs := worker.RunCollectors()
-	// Email diffs if changes are detected and email is enabled
-	if len(changedFiles) > 0 && a.config.EmailEnabled {
-		err := utils.GitSendEmail(a.config, diffs, changedFiles)
-		if err != nil {
-			// Log the error, but carry on.
-			log.Printf("WARNING: GIT notification email error: %v\n", err)
-		}
-	}
+	worker.RunCollectors()
 	// And check for any necessary commits.
 	err := utils.GitOps(a.config)
 	if err != nil {

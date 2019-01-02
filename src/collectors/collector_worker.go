@@ -14,14 +14,13 @@ import (
 
 // CollectorWorker write me.
 type CollectorWorker struct {
-	RunConfig      *configuration.Config
-	factory        collectorFactory
-	updatedConfigs []string
-	diffs          []string
+	RunConfig *configuration.Config
+	factory   collectorFactory
+	diffs     []string
 }
 
 // RunCollectors runs all collectors
-func (cw *CollectorWorker) RunCollectors() ([]string, []string) {
+func (cw *CollectorWorker) RunCollectors() {
 	cw.registerCollectors()
 	// Create a channel with a maximum size of configured concurrency
 	queue := make(chan bool, cw.RunConfig.Concurrency)
@@ -66,7 +65,13 @@ func (cw *CollectorWorker) RunCollectors() ([]string, []string) {
 		// In theory, a monitoring application (Check MK) will notice the problem.
 		log.Printf("Failed to write run result: %s\n", err.Error())
 	}
-	return cw.updatedConfigs, cw.diffs
+	// send email if anything changed.
+	if len(cw.diffs) > 0 {
+		if err := contraGit.GitSendEmail(cw.RunConfig, cw.diffs); err != nil {
+			log.Printf("WARNING: GIT notification email error: %v\n", err)
+		}
+	}
+
 }
 
 // Run the collector for this device.
@@ -151,19 +156,19 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	if err != nil {
 		return err
 	}
-	diff, err := contraGit.GitDiff(*cw.RunConfig, device.Name+".txt", parsed)
+	diff, err := contraGit.GitDiff(cw.RunConfig.Workspace, device.Name+".txt", parsed)
 	if err != nil {
 		log.Printf("error parsing changes in configuration for %s: %s\n", device.Name, err.Error())
 	}
 
 	if len(diff) > 0 {
+		log.Printf("changes found for device %s\n", device.Name)
 		cw.diffs = append(cw.diffs, diff)
-		cw.updatedConfigs = append(cw.updatedConfigs, device.Name)
 	}
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
-	if err := utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt"); err != nil {
+	if err := utils.WriteFile(cw.RunConfig.Workspace, parsed, device.Name+".txt"); err != nil {
 		log.Printf("Error saving config file: %s\n", err.Error())
 	}
 

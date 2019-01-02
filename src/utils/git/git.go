@@ -41,7 +41,7 @@ func GitOps(c *configuration.Config) error {
 	// Status will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
-		err := Commit(repo.Path, status, *worktree)
+		err := Commit(status, *worktree)
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func GitOps(c *configuration.Config) error {
 }
 
 // GitSendEmail sends git related email notifications
-func GitSendEmail(c *configuration.Config, changes, changedFiles []string) error {
+func GitSendEmail(c *configuration.Config, diffs []string) error {
 
 	// Bail out if email is disabled
 	if !c.EmailEnabled {
@@ -75,9 +75,7 @@ func GitSendEmail(c *configuration.Config, changes, changedFiles []string) error
 	}
 
 	// Convert slice of changes to a comma separated string
-	changesString := strings.Join(changes, "\n")
-
-	log.Printf("%s changed, sending email\n", strings.Join(changedFiles, ","))
+	changesString := strings.Join(diffs, "\n")
 
 	// Send email with changes
 	err := utils.SendEmail(c, c.EmailSubject, changesString)
