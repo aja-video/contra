@@ -77,7 +77,7 @@ func GitOps(c *configuration.Config) {
 	}
 }
 
-//gitSendEmail sends git related email notifications
+// gitSendEmail sends git related email notifications
 func gitSendEmail(c *configuration.Config, changes, changedFiles []string) {
 
 	// Bail out if email is disabled
