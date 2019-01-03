@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
+	contraGit "github.com/aja-video/contra/src/utils/git"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strconv"
@@ -15,6 +16,7 @@ import (
 type CollectorWorker struct {
 	RunConfig *configuration.Config
 	factory   collectorFactory
+	diffs     []string
 }
 
 // RunCollectors runs all collectors
@@ -63,6 +65,13 @@ func (cw *CollectorWorker) RunCollectors() {
 		// In theory, a monitoring application (Check MK) will notice the problem.
 		log.Printf("Failed to write run result: %s\n", err.Error())
 	}
+	// send email if anything changed.
+	if len(cw.diffs) > 0 {
+		if err := contraGit.GitSendEmail(cw.RunConfig, cw.diffs); err != nil {
+			log.Printf("WARNING: GIT notification email error: %v\n", err)
+		}
+	}
+
 }
 
 // Run the collector for this device.
@@ -147,10 +156,19 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	if err != nil {
 		return err
 	}
+	diff, err := contraGit.GitDiff(cw.RunConfig.Workspace, device.Name+".txt", parsed)
+	if err != nil {
+		log.Printf("error parsing changes in configuration for %s: %s\n", device.Name, err.Error())
+	}
+
+	if len(diff) > 0 {
+		log.Printf("changes found for device %s\n", device.Name)
+		cw.diffs = append(cw.diffs, diff)
+	}
 
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
-	if err := utils.WriteFile(*cw.RunConfig, parsed, device.Name+".txt"); err != nil {
+	if err := utils.WriteFile(cw.RunConfig.Workspace, parsed, device.Name+".txt"); err != nil {
 		log.Printf("Error saving config file: %s\n", err.Error())
 	}
 

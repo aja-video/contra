@@ -8,10 +8,8 @@ import (
 )
 
 // Commit will add and commit changes
-func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []string, error) {
+func Commit(status git.Status, worktree git.Worktree) error {
 	// Iterate over changed files to determine what is changed
-	var changes []string
-	var changedFiles []string
 	for file, status := range status {
 
 		// TODO: Maybe a cleaner way to do this?
@@ -29,15 +27,6 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []
 			log.Printf("Unhandled git status for file %s\n", file)
 
 		}
-		// Tack on files
-		changedFiles = append(changedFiles, file)
-
-		// Tack on diffs.
-		diff, err := GitDiff(path, file)
-		if err != nil {
-			return nil, nil, err
-		}
-		changes = append(changes, diff)
 	}
 
 	// Do the commit
@@ -51,8 +40,8 @@ func Commit(path string, status git.Status, worktree git.Worktree) ([]string, []
 			},
 		})
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 	log.Printf("Contra Git Commit: %s", commit)
-	return changes, changedFiles, err
+	return nil
 }
