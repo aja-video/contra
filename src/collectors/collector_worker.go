@@ -67,9 +67,8 @@ func (cw *CollectorWorker) RunCollectors() {
 	}
 	// send email if anything changed.
 	if len(cw.diffs) > 0 {
-		if err := contraGit.GitSendEmail(cw.RunConfig, cw.diffs); err != nil {
-			log.Printf("WARNING: GIT notification email error: %v\n", err)
-		}
+		// Attempt to send email. Email failure is logged, but does not interrupt this process.
+		contraGit.GitSendEmail(cw.RunConfig, cw.diffs)
 	}
 
 }
