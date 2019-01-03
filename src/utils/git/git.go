@@ -17,7 +17,7 @@ type Git struct {
 }
 
 // GitOps does stuff with git
-func GitOps(c *configuration.Config) error {
+func GitOps(c *configuration.Config) {
 
 	// Set up git instance
 	repo := new(Git)
@@ -25,61 +25,68 @@ func GitOps(c *configuration.Config) error {
 
 	// Open Repo for use by Contra
 	err := GitOpen(repo)
-
 	if err != nil {
-		return err
+		log.Printf("WARNING: Unable to open GIT repository: %v\n", err)
+		return
 	}
 
 	worktree, err := repo.Repo.Worktree()
-
 	if err != nil {
-		return err
+		log.Printf("WARNING: Failed to fetch GIT working tree: %v\n", err)
+		return
 	}
 
 	// Grab status and changes
 	status, changes, err := GitStatus(*worktree)
-	// Status will evaluate to true if something has changed
+	if err != nil {
+		log.Printf("WARNING: Failed to check GIT status: %v\n", err)
+		return
+	}
+
+	// Changes will evaluate to true if something has changed
 	if changes {
 		// Commit if changes detected
 		changesOut, changedFiles, err := Commit(repo.Path, status, *worktree)
 		if err != nil {
-			return err
+			log.Printf("WARNING: Error encountered during GIT commit: %v\n", err)
+			return
 		}
 		log.Println("GIT changes committed.")
 
-		err = gitSendEmail(c, changesOut, changedFiles)
-		if err != nil {
-			// Log the error, but carry on.
-			log.Printf("WARNING: GIT notification email error: %v\n", err)
-		}
+		// Attempt to send email. Email failure is logged, but does not interrupt this process.
+		gitSendEmail(c, changesOut, changedFiles)
 
 		// push to remote if configured
 		if c.GitPush {
 			// If private key file is set, init public key auth.
 			auth, err := gitSSHAuth(c)
 			if err != nil {
-				log.Printf(`WARNING: Error establish GIT authentication: "%s" changes will not be pushed.`, err)
-				log.Printf(`WARNING: Verify GitAuth and GitPrivateKey configuration in %s`, c.ConfigFile)
-				return nil
+				log.Printf(`WARNING: GitPush failed trying to establish GIT authentication: "%s" changes will not be pushed.`, err)
+				log.Printf(`INFO: Check configuration settings in %s`, c.ConfigFile)
+				log.Printf(`INFO: Set GitAuth = false if not using a custom private key.`)
+				log.Printf(`INFO: Set GitPush = false if not using a remote repository.`)
+				return
 			}
 			err = repo.Repo.Push(&git.PushOptions{Auth: auth})
 			if err != nil {
-				return err
+				log.Printf("WARNING: Failed to GIT push to remote: %v\n", err)
+				return
 			}
 			log.Println("GIT Push successful.")
 		}
 	}
-
-	return err
 }
 
 //gitSendEmail sends git related email notifications
-func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error {
+func gitSendEmail(c *configuration.Config, changes, changedFiles []string) {
 
 	// Bail out if email is disabled
 	if !c.EmailEnabled {
+		// Email is a core feature of this tool, so we are noisy about this being turned off.
+		// If other users complain, we can consider silencing this, or adding another parameter
+		// to silence it. Requiring two settings in order to quietly skip emailing.
 		log.Println("Email notifications are disabled.")
-		return nil
+		return
 	}
 
 	// Convert slice of changes to a comma separated string
@@ -89,12 +96,10 @@ func gitSendEmail(c *configuration.Config, changes, changedFiles []string) error
 
 	// Send email with changes
 	err := utils.SendEmail(c, c.EmailSubject, changesString)
-
 	if err != nil {
-		return err
+		// Log the error, but carry on.
+		log.Printf("WARNING: GIT notification email error: %v\n", err)
 	}
-
-	return nil
 }
 
 // gitSSHAuth sets up authentication for git a git remote

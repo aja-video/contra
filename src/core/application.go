@@ -110,10 +110,7 @@ func (a *Application) StandardRun() {
 	worker.RunCollectors()
 
 	// And check for any necessary commits.
-	err := utils.GitOps(a.config)
-	if err != nil {
-		log.Printf("WARNING: Error encountered during GIT operations: %v\n", err)
-	}
+	utils.GitOps(a.config)
 }
 
 // RunDaemon will persist and run collectors at the configured interval
