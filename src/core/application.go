@@ -108,7 +108,6 @@ func (a *Application) StandardRun() {
 	}
 	// Collect everything
 	worker.RunCollectors()
-
 	// And check for any necessary commits.
 	utils.GitOps(a.config)
 }

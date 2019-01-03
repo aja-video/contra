@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/aja-video/contra/src/configuration"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,11 +8,11 @@ import (
 )
 
 // WriteFile saves output to a file
-func WriteFile(c configuration.Config, config string, name string) error {
+func WriteFile(workspace, config, name string) error {
 	// Create file inside workspace folder
-	err := workspaceExists(c)
+	err := workspaceExists(workspace)
 	if err == nil {
-		f, err := os.Create(c.Workspace + "/" + name)
+		f, err := os.Create(workspace + "/" + name)
 		if err != nil {
 			log.Printf("Unable to create config file %s\n", name)
 			return err
@@ -28,14 +27,14 @@ func WriteFile(c configuration.Config, config string, name string) error {
 }
 
 // workspaceExists checks for or creates the workspace directory
-func workspaceExists(c configuration.Config) error {
+func workspaceExists(workspace string) error {
 	// Check if the workspace is a directory
-	if ws, err := os.Stat(c.Workspace); err == nil && ws.IsDir() {
+	if ws, err := os.Stat(workspace); err == nil && ws.IsDir() {
 		return nil
 	}
 
 	// Create directory if it isn't there
-	err := os.Mkdir(c.Workspace, os.ModePerm)
+	err := os.Mkdir(workspace, os.ModePerm)
 
 	return err
 }
