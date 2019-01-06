@@ -5,6 +5,7 @@ import (
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
 	contraGit "github.com/aja-video/contra/src/utils/git"
+	"github.com/google/goexpect"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strconv"
@@ -38,9 +39,12 @@ func (cw *CollectorWorker) RunCollectors() {
 		queue <- true
 		// Start collection process for each device
 		go func(config configuration.DeviceConfig) {
-			err := cw.Run(config)
+			diff, err := cw.Run(config)
 			if err != nil {
 				log.Printf("Worker resulted in an error: %s\n", err.Error())
+			} else if len(diff) > 0 {
+				log.Printf("changes found for device %s\n", config.Name)
+				cw.diffs = append(cw.diffs, diff)
 			}
 			// Remove an element from the queue when the collection has finished
 			defer func() {
@@ -74,43 +78,18 @@ func (cw *CollectorWorker) RunCollectors() {
 }
 
 // Run the collector for this device.
-func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
+func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error) {
 	log.Printf("Collect Start: %s\n", device.Name)
 	var connection *ssh.Client
-	var err error
 
-	// Initialize Collector
-	collector, err := cw.factory.MakeCollector(device.Type)
+	// call buildCollector to assemble the collector and batcher
+	collector, batchSlice, err := cw.buildCollector(device)
 	if err != nil {
-		return err
-	}
-	collector.SetDeviceConfig(device)
-
-	batchSlice, err := collector.BuildBatcher()
-	if err != nil {
-		return err
+		return "", err
 	}
 
-	// Set up SSHConfig
-	s := &utils.SSHConfig{
-		User:          device.User,
-		Pass:          device.Pass,
-		Host:          device.Host + ":" + strconv.Itoa(device.Port),
-		AuthMethod:    device.SSHAuthMethod,
-		PrivateKey:    device.SSHPrivateKey,
-		AllowInsecure: device.AllowInsecureSSH,
-		SSHTimeout:    device.SSHTimeout,
-	}
-
-	// Special case... only some collectors need to make some modifications.
-	if collectorSpecial, ok := collector.(CollectorSpecial); ok {
-		collectorSpecial.ModifySSHConfig(s)
-	}
-
-	// Pull in device config Cipher overrides if necessary.
-	if device.Ciphers != "" {
-		s.Ciphers = strings.Split(device.Ciphers, ",")
-	}
+	// Set up device SSHConfig
+	s := cw.buildSSH(collector, device)
 
 	// handle client timeouts
 	clientConnected := make(chan struct{})
@@ -122,15 +101,11 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	select {
 	case <-clientConnected:
 		break
-	case <-time.After(10 * time.Second):
-		return cw.collectFailure(device, errors.New("SSH Client timeout"))
-	}
-
-	if err != nil {
-		return cw.collectFailure(device, err)
+	case <-time.After(device.SSHTimeout):
+		return "", cw.collectFailure(device, errors.New("SSH Client timeout"))
 	}
 	// call GatherExpect to collect the configs
-	result, err := utils.GatherExpect(batchSlice, time.Second*10, connection)
+	result, err := utils.GatherExpect(batchSlice, device.SSHTimeout, connection)
 	if err != nil {
 		// Close the connection if collection fails
 		closeErr := connection.Close()
@@ -138,7 +113,7 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 			log.Printf("WARNING: Unable to close SSH connection for device %s %s\n", device.Name, closeErr.Error())
 		}
 		// return the collection error
-		return cw.collectFailure(device, err)
+		return "", cw.collectFailure(device, err)
 	}
 	// Read from FailChan if it isn't empty
 	if len(device.FailChan) > 0 {
@@ -153,25 +128,18 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) error {
 	lastResult := result[len(result)-1].Output
 	parsed, err := collector.ParseResult(lastResult)
 	if err != nil {
-		return err
+		return "", err
 	}
 	diff, err := contraGit.GitDiff(cw.RunConfig.Workspace, device.Name+".txt", parsed)
 	if err != nil {
 		log.Printf("error parsing changes in configuration for %s: %s\n", device.Name, err.Error())
 	}
 
-	if len(diff) > 0 {
-		log.Printf("changes found for device %s\n", device.Name)
-		cw.diffs = append(cw.diffs, diff)
-	}
-
 	log.Printf("Writing: %s\nLength: %d\n", device.Name, len(parsed))
 
-	if err := utils.WriteFile(cw.RunConfig.Workspace, parsed, device.Name+".txt"); err != nil {
-		log.Printf("Error saving config file: %s\n", err.Error())
-	}
+	err = utils.WriteFile(cw.RunConfig.Workspace, parsed, device.Name+".txt")
 
-	return nil
+	return diff, err
 
 }
 
@@ -207,4 +175,43 @@ func (cw *CollectorWorker) registerCollectors() {
 	for name, device := range deviceMap {
 		cw.factory.Register(name, device)
 	}
+}
+
+// buildCollector puts the pieces together for a working collector
+func (cw *CollectorWorker) buildCollector(device configuration.DeviceConfig) (Collector, []expect.Batcher, error) {
+	// Initialize Collector
+	collector, err := cw.factory.MakeCollector(device.Type)
+	if err != nil {
+		return nil, nil, err
+	}
+	collector.SetDeviceConfig(device)
+
+	batchSlice, err := collector.BuildBatcher()
+	if err != nil {
+		return nil, nil, err
+	}
+	return collector, batchSlice, err
+}
+
+func (cw *CollectorWorker) buildSSH(collector Collector, device configuration.DeviceConfig) *utils.SSHConfig {
+	s := &utils.SSHConfig{
+		User:          device.User,
+		Pass:          device.Pass,
+		Host:          device.Host + ":" + strconv.Itoa(device.Port),
+		AuthMethod:    device.SSHAuthMethod,
+		PrivateKey:    device.SSHPrivateKey,
+		AllowInsecure: device.AllowInsecureSSH,
+		SSHTimeout:    device.SSHTimeout,
+	}
+
+	// Special case... only some collectors need to make some modifications.
+	if collectorSpecial, ok := collector.(CollectorSpecial); ok {
+		collectorSpecial.ModifySSHConfig(s)
+	}
+
+	// Pull in device config Cipher overrides if necessary.
+	if device.Ciphers != "" {
+		s.Ciphers = strings.Split(device.Ciphers, ",")
+	}
+	return s
 }
