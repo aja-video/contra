@@ -49,7 +49,7 @@ func SSHClient(c SSHConfig) (*ssh.Client, error) {
 	if c.AllowInsecure {
 		config.HostKeyCallback = ssh.InsecureIgnoreHostKey()
 	} else {
-		return nil, fmt.Errorf("host key checking not yet implimented")
+		return nil, fmt.Errorf("host key checking not yet implemented")
 		//config.HostKeyCallback = ssh.FixedHostKey(ssh.PublicKey(hostkey))
 	}
 
