@@ -93,13 +93,18 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error
 
 	// handle client timeouts
 	clientConnected := make(chan struct{})
-	go func() {
-		connection, err = utils.SSHClient(*s)
+
+	go func(err *error) {
+		connection, *err = utils.SSHClient(*s)
 		close(clientConnected)
-	}()
+	}(&err)
+
 	// wait for client
 	select {
 	case <-clientConnected:
+		if err != nil {
+			return "", cw.collectFailure(device, err)
+		}
 		break
 	case <-time.After(device.SSHTimeout):
 		return "", cw.collectFailure(device, errors.New("SSH Client timeout"))
@@ -205,8 +210,11 @@ func (cw *CollectorWorker) buildSSH(collector Collector, device configuration.De
 	}
 
 	// Special case... only some collectors need to make some modifications.
-	if collectorSpecial, ok := collector.(CollectorSpecial); ok {
-		collectorSpecial.ModifySSHConfig(s)
+	if CollectorSpecial, ok := collector.(CollectorSpecialSSH); ok {
+		CollectorSpecial.ModifySSHConfig(s)
+	}
+	if collectorSpecial, ok := collector.(CollectorTerminalSpecial); ok {
+		collectorSpecial.ModifyUsername(s)
 	}
 
 	// Pull in device config Cipher overrides if necessary.
