@@ -13,7 +13,12 @@ type Collector interface {
 	ParseResult(string) (string, error)
 }
 
-// CollectorSpecial is special.
-type CollectorSpecial interface {
+// CollectorSpecialSSH is special.
+type CollectorSpecialSSH interface {
 	ModifySSHConfig(config *utils.SSHConfig)
+}
+
+// CollectorSpecialTerminal is also special
+type CollectorSpecialTerminal interface {
+	ModifyUsername(config *utils.SSHConfig)
 }
