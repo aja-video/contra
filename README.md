@@ -64,15 +64,12 @@ the application. Using the `-configtest` flag will exit even if the checks pass.
 * HP/Comware
     * For locked down devices use UnlockPass in the device configuration to unlock xtd-cli-mode
 * Arista
-
-### Soon
-
-* Cisco
-* Juniper (JunOS)
-
+* Mikrotrik
 
 ### Someday
 
+* Cisco
+* Juniper (JunOS)
 * http
 * custom scripting
 
