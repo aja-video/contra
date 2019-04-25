@@ -18,7 +18,7 @@ type CollectorSpecialSSH interface {
 	ModifySSHConfig(config *utils.SSHConfig)
 }
 
-// CollectorTerminalSpecial is also special
-type CollectorTerminalSpecial interface {
+// CollectorSpecialTerminal is also special
+type CollectorSpecialTerminal interface {
 	ModifyUsername(config *utils.SSHConfig)
 }

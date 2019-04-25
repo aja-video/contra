@@ -95,7 +95,10 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error
 	clientConnected := make(chan struct{})
 
 	go func(err *error) {
+		// set outer scope err
+		// this looks like a terrible idea, but the blocking select {} below makes it safe
 		connection, *err = utils.SSHClient(*s)
+		// close() immediately triggers <-clientConnected
 		close(clientConnected)
 	}(&err)
 
@@ -210,10 +213,10 @@ func (cw *CollectorWorker) buildSSH(collector Collector, device configuration.De
 	}
 
 	// Special case... only some collectors need to make some modifications.
-	if CollectorSpecial, ok := collector.(CollectorSpecialSSH); ok {
-		CollectorSpecial.ModifySSHConfig(s)
+	if collectorSpecial, ok := collector.(CollectorSpecialSSH); ok {
+		collectorSpecial.ModifySSHConfig(s)
 	}
-	if collectorSpecial, ok := collector.(CollectorTerminalSpecial); ok {
+	if collectorSpecial, ok := collector.(CollectorSpecialTerminal); ok {
 		collectorSpecial.ModifyUsername(s)
 	}
 
