@@ -10,6 +10,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -24,7 +25,8 @@ type CollectorWorker struct {
 func (cw *CollectorWorker) RunCollectors() {
 	cw.registerCollectors()
 	// Create a channel with a maximum size of configured concurrency
-	queue := make(chan bool, cw.RunConfig.Concurrency)
+	queue := make(chan struct{}, cw.RunConfig.Concurrency)
+	wg := sync.WaitGroup{}
 	for _, device := range cw.RunConfig.Devices {
 		// sanity check timeout
 		if device.SSHTimeout < time.Second {
@@ -35,10 +37,13 @@ func (cw *CollectorWorker) RunCollectors() {
 			log.Printf("Config disabled: %v", device.Name)
 			continue
 		}
-		// Add an element to the queue for each enabled device
-		queue <- true
+		// Add an element to the queue to limit concurrency
+		queue <- struct{}{}
+		wg.Add(1)
+
 		// Start collection process for each device
 		go func(config configuration.DeviceConfig) {
+			defer wg.Done()
 			diff, err := cw.Run(config)
 			if err != nil {
 				log.Printf("Worker resulted in an error: %s\n", err.Error())
@@ -47,17 +52,12 @@ func (cw *CollectorWorker) RunCollectors() {
 				cw.diffs = append(cw.diffs, diff)
 			}
 			// Remove an element from the queue when the collection has finished
-			defer func() {
-				<-queue
-			}()
+			<-queue
 		}(device)
 
 	}
-	// If we can add to the queue a number of elements equal to concurrency
-	// our goroutines are finished and we can leave this function
-	for l := 0; l < cap(queue); l++ {
-		queue <- true
-	}
+	// wait for all collections to finish
+	wg.Wait()
 
 	// Currently we are simply notifying that we attempted 4 collections, but we do not
 	// reduce this number in the case of an expired ssh timer failure. We may want to.
