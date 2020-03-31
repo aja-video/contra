@@ -12,4 +12,5 @@ var deviceMap = map[string]interface{}{
 	"pfsense":    devices.DevicePfsense{},
 	"procurve":   devices.DeviceProcurve{},
 	"vyatta":     devices.DeviceVyatta{},
+	"route53":    devices.DeviceRoute53{},
 }
