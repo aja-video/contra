@@ -80,7 +80,7 @@ func (cw *CollectorWorker) RunCollectors() {
 // Run the collector for this device.
 func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error) {
 	log.Printf("Collect Start: %s\n", device.Name)
-	var connection *ssh.Client
+	var lastResult string
 
 	// call buildCollector to assemble the collector and batcher
 	collector, batchSlice, err := cw.buildCollector(device)
@@ -88,52 +88,62 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error
 		return "", err
 	}
 
-	// Set up device SSHConfig
-	s := cw.buildSSH(collector, device)
+	// route53 does not use ssh
+	// TODO: This should be fixed - quick solution to skip SSH for a single collector, but type doesn't scale
+	if device.Type != "route53" {
 
-	// handle client timeouts
-	clientConnected := make(chan struct{})
+		var connection *ssh.Client
 
-	go func(err *error) {
-		// set outer scope err
-		// this looks like a terrible idea, but the blocking select {} below makes it safe
-		connection, *err = utils.SSHClient(*s)
-		// close() immediately triggers <-clientConnected
-		close(clientConnected)
-	}(&err)
+		// Set up device SSHConfig
+		s := cw.buildSSH(collector, device)
 
-	// wait for client
-	select {
-	case <-clientConnected:
+		// handle client timeouts
+		clientConnected := make(chan struct{})
+
+		go func(err *error) {
+			// set outer scope err
+			// this looks like a terrible idea, but the blocking select {} below makes it safe
+			connection, *err = utils.SSHClient(*s)
+			// close() immediately triggers <-clientConnected
+			close(clientConnected)
+		}(&err)
+
+		// wait for client
+		select {
+		case <-clientConnected:
+			if err != nil {
+				return "", cw.collectFailure(device, err)
+			}
+			break
+		case <-time.After(device.SSHTimeout):
+			return "", cw.collectFailure(device, errors.New("SSH Client timeout"))
+		}
+		// call GatherExpect to collect the configs
+		result, err := utils.GatherExpect(batchSlice, device.SSHTimeout, connection)
 		if err != nil {
+			// Close the connection if collection fails
+			closeErr := connection.Close()
+			if closeErr != nil {
+				log.Printf("WARNING: Unable to close SSH connection for device %s %s\n", device.Name, closeErr.Error())
+			}
+			// return the collection error
 			return "", cw.collectFailure(device, err)
 		}
-		break
-	case <-time.After(device.SSHTimeout):
-		return "", cw.collectFailure(device, errors.New("SSH Client timeout"))
-	}
-	// call GatherExpect to collect the configs
-	result, err := utils.GatherExpect(batchSlice, device.SSHTimeout, connection)
-	if err != nil {
-		// Close the connection if collection fails
-		closeErr := connection.Close()
-		if closeErr != nil {
-			log.Printf("WARNING: Unable to close SSH connection for device %s %s\n", device.Name, closeErr.Error())
+
+		// Read from FailChan if it isn't empty
+		if len(device.FailChan) > 0 {
+			<-device.FailChan
 		}
-		// return the collection error
-		return "", cw.collectFailure(device, err)
+		// Close ssh connection
+		err = connection.Close()
+		if err != nil {
+			log.Printf("WARNING: Error closing SSH Connection for %s: %s\n", device.Name, err.Error())
+		}
+
+		// Grab just the last result.
+		lastResult = result[len(result)-1].Output
 	}
-	// Read from FailChan if it isn't empty
-	if len(device.FailChan) > 0 {
-		<-device.FailChan
-	}
-	// Close ssh connection
-	err = connection.Close()
-	if err != nil {
-		log.Printf("WARNING: Error closing SSH Connection for %s: %s\n", device.Name, err.Error())
-	}
-	// Grab just the last result.
-	lastResult := result[len(result)-1].Output
+
 	parsed, err := collector.ParseResult(lastResult)
 	if err != nil {
 		return "", err

@@ -71,6 +71,8 @@ type DeviceConfig struct {
 	SSHAuthMethod    string
 	SSHPrivateKey    string
 	AllowInsecureSSH bool
+	// Route53 settings
+	ZoneID string
 }
 
 // GetName provides a simple implementation for the Collector interface.
