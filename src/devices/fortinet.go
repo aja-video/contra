@@ -32,6 +32,9 @@ func (p *DeviceFortinet) BuildBatcher() ([]expect.Batcher, error) {
 func (p *DeviceFortinet) ParseResult(result string) (string, error) {
 	matcher := regexp.MustCompile(`#config-version[\s\S]*end`)
 	match := matcher.FindStringSubmatch(result)
+	// redact encrypted passwords as they change every run
+	encryptedPassword := regexp.MustCompile("ENC .*==")
+	redactedResult := encryptedPassword.ReplaceAllString(match[0], "ENC ~~~Contra Redacted~~~")
 
-	return match[0], nil
+	return redactedResult, nil
 }
