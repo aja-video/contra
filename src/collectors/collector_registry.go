@@ -8,6 +8,7 @@ var deviceMap = map[string]interface{}{
 	"cisco_csb":  devices.DeviceCiscoCsb{},
 	"comware":    devices.DeviceComware{},
 	"edgeswitch": devices.DeviceEdgeSwitch{},
+	"fortinet":   devices.DeviceFortinet{},
 	"mikrotik":   devices.DeviceMikrotik{},
 	"pfsense":    devices.DevicePfsense{},
 	"procurve":   devices.DeviceProcurve{},
