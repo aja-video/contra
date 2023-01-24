@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//GitOpen opens or initializes the repository
+// GitOpen opens or initializes the repository
 func GitOpen(g *Git) error {
 	var err error
 	// Open existing local repo

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//SSHConfig type to map SSH Configs
+// SSHConfig type to map SSH Configs
 type SSHConfig struct {
 	User          string
 	Pass          string
