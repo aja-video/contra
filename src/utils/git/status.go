@@ -4,7 +4,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 )
 
-//GitStatus reports the current working tree status
+// GitStatus reports the current working tree status
 func GitStatus(worktree git.Worktree) (git.Status, bool, error) {
 	// Assume no changes
 	gitChanged := false
