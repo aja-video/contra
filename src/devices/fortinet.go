@@ -30,7 +30,7 @@ func (p *DeviceFortinet) BuildBatcher() ([]expect.Batcher, error) {
 
 // ParseResult for Fortinet
 func (p *DeviceFortinet) ParseResult(result string) (string, error) {
-	matcher := regexp.MustCompile(`#config-version[\s\S]*end`)
+	matcher := regexp.MustCompile(`config system global[\s\S]*end`)
 	match := matcher.FindStringSubmatch(result)
 	// redact encrypted passwords as they change every run
 	encryptedPassword := regexp.MustCompile("ENC .*==")
