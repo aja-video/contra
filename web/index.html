@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CONTRA</title>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<h1>
+<pre>
+==================================================================
+==      6767       7979    78    78  84848484  828282      65   ==
+==    67   67   79    79  7878  78     84     82   82   65  65  ==
+==   67        79    79  78  7878     84     828282   65656565  ==
+==  67    67  79    79  78    78     84     82  82   65    65   ==
+==   6767      7979    78    78     84     82   82  65    65    ==
+==================================================================
+</pre>
+</h1>
+<h2>Last Run</h2>
+<table>
+    <tr>
+        <td><a href="/diffs/last.txt" target="_blank" rel="noopener noreferrer">View</a></td>
+        <td><a href="/dl/diffs/last.txt">Download</a></td>
+    </tr>
+</table>
+<h2>Device Configs</h2>
+<table>
+    <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Config</th>
+        <th>Diff</th>
+        <th>Download</th>
+    </tr>
+    {{range .}}
+    <tr>
+        <td>{{.Model}}</td>
+        <td>{{.Name}}</td>
+        <td><a href="/view/{{.Name}}.txt" target="_blank" rel="noopener noreferrer">View</a></td>
+        <td><a href="/diffs/{{.Name}}.txt" target="_blank" rel="noopener noreferrer">View</a></td>
+        <td><a href="/dl/{{.Name}}.txt">Download</a></td>
+    </tr>
+    {{end}}
+</table>
+
+<div style="justify-content: left">
+    <br>
+    <ul>View: View the full device configuration</ul>
+    <ul>Diff: View the most recent configuration diff</ul>
+    <ul>Download: Download the configuration file</ul>
+</div>
+
+</body>
+</html>

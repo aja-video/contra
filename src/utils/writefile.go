@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"strconv"
 )
 
@@ -11,6 +12,9 @@ import (
 func WriteFile(workspace, config, name string) error {
 	// Create file inside workspace folder
 	err := workspaceExists(workspace)
+	if err == nil {
+		err = gitIgnoreExists(workspace)
+	}
 	if err == nil {
 		f, err := os.Create(workspace + "/" + name)
 		if err != nil {
@@ -37,6 +41,16 @@ func workspaceExists(workspace string) error {
 	err := os.Mkdir(workspace, os.ModePerm)
 
 	return err
+}
+
+// gitIgnoreExists checks for or creates .gitignore in the workspace
+func gitIgnoreExists(workspace string) error {
+	filename := path.Join(workspace, ".gitignore")
+	if _, err := os.Stat(filename); err == nil {
+		return nil
+	}
+	ignore := []byte("diffs")
+	return ioutil.WriteFile(filename, ignore, 0644)
 }
 
 // WriteRunResult will write the count value into the runresult.log file and update the timestamp each run.

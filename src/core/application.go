@@ -5,13 +5,14 @@ import (
 	"github.com/aja-video/contra/src/collectors"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils/git"
+	"github.com/aja-video/contra/src/utils/web"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
 )
 
-const version = "1.0.53"
+const version = "1.0.54"
 
 // Application holds global application data and functions for kicking off execution.
 type Application struct {
@@ -114,6 +115,9 @@ func (a *Application) StandardRun() {
 
 // RunDaemon will persist and run collectors at the configured interval
 func (a *Application) RunDaemon() {
+	if a.config.WebUI {
+		go web.ServeWeb(a.config)
+	}
 	for {
 		// Reload Config
 		configuration.ReloadConfig()

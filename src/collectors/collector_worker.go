@@ -48,6 +48,9 @@ func (cw *CollectorWorker) RunCollectors() {
 			if err != nil {
 				log.Printf("Worker resulted in an error: %s\n", err.Error())
 			} else if len(diff) > 0 {
+				if cw.RunConfig.WebUI {
+					_ = utils.WriteFile(cw.RunConfig.Workspace+"/diffs/", diff, config.Name+".txt")
+				}
 				log.Printf("changes found for device %s\n", config.Name)
 				cw.diffs = append(cw.diffs, diff)
 			}
@@ -73,6 +76,9 @@ func (cw *CollectorWorker) RunCollectors() {
 	if len(cw.diffs) > 0 {
 		// Attempt to send email. Email failure is logged, but does not interrupt this process.
 		contraGit.GitSendEmail(cw.RunConfig, cw.diffs)
+		if cw.RunConfig.WebUI {
+			_ = utils.WriteFile(cw.RunConfig.Workspace+"/diffs/", strings.Join(cw.diffs, "\n"), "last.txt")
+		}
 	}
 
 }

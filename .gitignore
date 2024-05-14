@@ -15,3 +15,5 @@ workspace/
 
 # IDE cruft
 .idea/
+*.crt
+*.key

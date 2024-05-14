@@ -24,6 +24,24 @@ type Config struct {
 	Timeout     time.Duration
 	Daemonize   bool
 
+	// Web UI
+	WebUI   bool
+	WebRoot string
+	WebPort string
+	WebTLS  bool
+	WebCert string
+	WebKey  string
+	WebAuth string
+	// Basic Auth
+	WebUser string
+	WebPass string
+	// LDAP
+	LdapServer   string
+	LdapBaseDN   string
+	LdapBindUser string
+	LdapBindPass string
+	LdapFilter   string
+
 	// Git
 	GitPush       bool
 	GitAuth       bool
@@ -96,5 +114,7 @@ func getConfigDefaults() *Config {
 		GitAuth:          true,
 		GitUser:          "git",
 		GitPrivateKey:    ".ssh/id_rsa",
+		WebUI:            false,
+		WebRoot:          "web",
 	}
 }

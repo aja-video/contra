@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/aws/aws-sdk-go v1.44.185
 	github.com/go-ini/ini v1.67.0
+	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/google/goexpect v0.0.0-20210430020637-ab937bf7fd6f
 	github.com/pmezard/go-difflib v1.0.0
 	golang.org/x/crypto v0.5.0
@@ -31,6 +32,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230123190316-2c411cf9d197 // indirect
 	google.golang.org/grpc v1.52.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
