@@ -3,8 +3,8 @@ package utils
 import (
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
-	"gopkg.in/src-d/go-git.v4"
-	gitSsh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
+	"github.com/go-git/go-git/v5"
+	gitSsh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"log"
 	"strings"
 )
