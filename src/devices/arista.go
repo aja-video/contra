@@ -22,7 +22,6 @@ func (p *DeviceArista) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
 		{".*>", "terminal length 0"},
 		{".*>", "enable"},
-		{"Password:", p.UnlockPass},
 		{".*#", "show run"},
 		{"end"},
 	})
