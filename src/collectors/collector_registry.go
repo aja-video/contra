@@ -10,6 +10,7 @@ var deviceMap = map[string]interface{}{
 	"edgeswitch": devices.DeviceEdgeSwitch{},
 	"fortinet":   devices.DeviceFortinet{},
 	"mikrotik":   devices.DeviceMikrotik{},
+	"netgear":    devices.DeviceNetgear{},
 	"pfsense":    devices.DevicePfsense{},
 	"procurve":   devices.DeviceProcurve{},
 	"vyatta":     devices.DeviceVyatta{},
