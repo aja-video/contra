@@ -22,6 +22,7 @@ func (p *DeviceMikrotik) SetDeviceConfig(deviceConfig configuration.DeviceConfig
 func (p *DeviceMikrotik) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
 		{`\[.*@.*] >`, "/export\r"},
+		{`\/export`},
 		{`\[.*@.*] >`},
 	})
 }
