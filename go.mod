@@ -1,13 +1,13 @@
 module github.com/aja-video/contra
 
-go 1.19
+go 1.24.0
 
 require (
 	github.com/aws/aws-sdk-go v1.44.185
 	github.com/go-ini/ini v1.67.0
 	github.com/google/goexpect v0.0.0-20210430020637-ab937bf7fd6f
 	github.com/pmezard/go-difflib v1.0.0
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.46.0
 	gopkg.in/src-d/go-git.v4 v4.13.1
 )
 
@@ -24,10 +24,11 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	golang.org/x/mod v0.7.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/tools v0.5.0 // indirect
+	golang.org/x/lint v0.0.0-20241112194109-818c5a804067 // indirect
+	golang.org/x/mod v0.31.0 // indirect
+	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/genproto v0.0.0-20230123190316-2c411cf9d197 // indirect
 	google.golang.org/grpc v1.52.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

@@ -73,6 +73,8 @@ type DeviceConfig struct {
 	AllowInsecureSSH bool
 	// Route53 settings
 	ZoneID string
+	// http-json settings
+	Endpoint string
 }
 
 // GetName provides a simple implementation for the Collector interface.

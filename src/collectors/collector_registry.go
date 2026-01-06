@@ -14,4 +14,5 @@ var deviceMap = map[string]interface{}{
 	"procurve":   devices.DeviceProcurve{},
 	"vyatta":     devices.DeviceVyatta{},
 	"route53":    devices.DeviceRoute53{},
+	"http-json":  devices.DeviceHTTPJSON{},
 }

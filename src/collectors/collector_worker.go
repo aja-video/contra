@@ -88,9 +88,9 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error
 		return "", err
 	}
 
-	// route53 does not use ssh
+	// route53 and http-json do not use ssh
 	// TODO: This should be fixed - quick solution to skip SSH for a single collector, but type doesn't scale
-	if device.Type != "route53" {
+	if device.Type != "route53" && device.Type != "http-json" {
 
 		var connection *ssh.Client
 
