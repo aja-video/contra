@@ -74,8 +74,7 @@ type DeviceConfig struct {
 	// Route53 settings
 	ZoneID string
 	// http-json settings
-	Endpoint     string
-	ReturnFormat string
+	Endpoint string
 }
 
 // GetName provides a simple implementation for the Collector interface.
