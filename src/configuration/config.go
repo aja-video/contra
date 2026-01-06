@@ -52,11 +52,12 @@ type Config struct {
 
 // DeviceConfig holds the device specific settings.
 type DeviceConfig struct {
-	Name string
-	Host string
-	Type string
-	User string
-	Pass string
+	Name          string
+	Host          string
+	Type          string
+	User          string
+	Pass          string
+	ConnectMethod string
 	// UnlockPass is used to access xtd-cli-mode on certain hp/comware devices, or enable for Cisco/etc..
 	UnlockPass string
 	Port       int
@@ -73,6 +74,9 @@ type DeviceConfig struct {
 	AllowInsecureSSH bool
 	// Route53 settings
 	ZoneID string
+	// http-json settings
+	Endpoint     string
+	ReturnFormat string
 }
 
 // GetName provides a simple implementation for the Collector interface.
