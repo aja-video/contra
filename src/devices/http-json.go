@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
@@ -44,42 +41,9 @@ func formatJSON(rawJSON []byte) (string, error) {
 	return prettyJSON.String(), nil
 }
 
-func doHTTPRequest(p *DeviceHTTPJSON) ([]byte, error) {
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-	uri := "https://" + p.Host + ":" + strconv.Itoa(p.Port) + p.Endpoint
-
-	req, err := http.NewRequest("GET", uri, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Token "+p.Pass)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to read body: %w", err)
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return body, fmt.Errorf("server returned status: %d", resp.StatusCode)
-	}
-
-	return body, nil
-}
-
 // ParseResult for http
 func (p *DeviceHTTPJSON) ParseResult(result string) (string, error) {
-	body, err := doHTTPRequest(p)
+	body, err := utils.HTTPRequest(p.Host, strconv.Itoa(p.Port), p.Endpoint, p.Pass)
 	if err != nil {
 		return string(body), err
 	}
