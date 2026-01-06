@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// HTTPRequest Create and perform an HTTP get request with optional token auth
 func HTTPRequest(host string, port string, endpoint string, pass string) ([]byte, error) {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
