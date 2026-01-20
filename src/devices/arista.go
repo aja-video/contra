@@ -1,6 +1,7 @@
 package devices
 
 import (
+	"fmt"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
 	"github.com/google/goexpect"
@@ -22,7 +23,6 @@ func (p *DeviceArista) BuildBatcher() ([]expect.Batcher, error) {
 	return utils.SimpleBatcher([][]string{
 		{".*>", "terminal length 0"},
 		{".*>", "enable"},
-		{"Password:", p.UnlockPass},
 		{".*#", "show run"},
 		{"end"},
 	})
@@ -31,7 +31,10 @@ func (p *DeviceArista) BuildBatcher() ([]expect.Batcher, error) {
 // ParseResult for Arista
 func (p *DeviceArista) ParseResult(result string) (string, error) {
 
-	matcher := regexp.MustCompile(`![\s\S]*end`)
+	matcher := regexp.MustCompile(`(?ms)!.*?^end`)
 	match := matcher.FindStringSubmatch(result)
+	if len(match) == 0 {
+		return "", fmt.Errorf("Arista configuration match not found")
+	}
 	return match[0], nil
 }
