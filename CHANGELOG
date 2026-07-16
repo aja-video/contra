@@ -1,3 +1,14 @@
+# Unreleased
+
+- Migrated from the archived `gopkg.in/src-d/go-git.v4` to the maintained
+  `github.com/go-git/go-git/v5`, resolving CVE-2023-49568, CVE-2023-49569,
+  CVE-2025-21613, and CVE-2025-21614 (no fix was available in v4).
+- BREAKING (SSH git push): go-git v5 verifies the remote SSH host key against
+  known_hosts by default; v4 did not. If you use `GitPush` over SSH, add the
+  remote host to `~/.ssh/known_hosts` (or point `SSH_KNOWN_HOSTS` at a hosts
+  file). To keep the previous behavior and skip host-key verification, set
+  `GitVerifyHostKey = false` in the `[main]` section of contra.conf.
+
 # v1.0.0
 
 - Initial stable release with functional collection and tracking.
