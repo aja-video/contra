@@ -29,6 +29,9 @@ type Config struct {
 	GitAuth       bool
 	GitUser       string
 	GitPrivateKey string
+	// GitVerifyHostKey verifies the remote SSH host key against known_hosts
+	// during git push. Set to false to skip verification.
+	GitVerifyHostKey bool
 
 	// User Settings
 	Workspace string
@@ -98,5 +101,6 @@ func getConfigDefaults() *Config {
 		GitAuth:          true,
 		GitUser:          "git",
 		GitPrivateKey:    ".ssh/id_rsa",
+		GitVerifyHostKey: true,
 	}
 }

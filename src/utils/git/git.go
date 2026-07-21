@@ -3,8 +3,9 @@ package utils
 import (
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
-	"gopkg.in/src-d/go-git.v4"
-	gitSsh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
+	"github.com/go-git/go-git/v5"
+	gitSsh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	"golang.org/x/crypto/ssh"
 	"log"
 	"strings"
 )
@@ -107,6 +108,15 @@ func gitSSHAuth(c *configuration.Config) (gitSsh.AuthMethod, error) {
 	}
 
 	auth, err := gitSsh.NewPublicKeysFromFile(c.GitUser, c.GitPrivateKey, "")
-	return auth, err
+	if err != nil {
+		return nil, err
+	}
 
+	// go-git v5 verifies the remote host key against known_hosts by default.
+	// When GitVerifyHostKey is disabled, skip verification explicitly.
+	if !c.GitVerifyHostKey {
+		auth.HostKeyCallback = ssh.InsecureIgnoreHostKey()
+	}
+
+	return auth, nil
 }
