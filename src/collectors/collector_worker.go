@@ -130,10 +130,8 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error
 			return "", cw.collectFailure(device, err)
 		}
 
-		// Read from FailChan if it isn't empty
-		if len(device.FailChan) > 0 {
-			<-device.FailChan
-		}
+		// Successful collection - clear any recorded failure state for this device.
+		globalFailureTracker.recordSuccess(device.Name)
 		// Close ssh connection
 		err = connection.Close()
 		if err != nil {
@@ -163,20 +161,16 @@ func (cw *CollectorWorker) Run(device configuration.DeviceConfig) (string, error
 
 // collectFailure handles collector failures
 func (cw *CollectorWorker) collectFailure(d configuration.DeviceConfig, err error) error {
-	// define email notification content
-	var message []string
-	message = append(message, "Contra was unable to gather configs from",
-		d.Name, strconv.Itoa(d.FailureWarning), "times", "last error:", err.Error())
-	// Add an element to the warning queue if it isn't full
-	if len(d.FailChan) < cap(d.FailChan) {
-		d.FailChan <- true
-	} else if cap(d.FailChan) > 0 {
-		// Fire off an email if the warning queue is full and email is enabled
-		_ = utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
-		// Empty the channel after we've reset a notification
-		for len(d.FailChan) > 0 {
-			<-d.FailChan
+	// Record the failure and decide whether it warrants an alert. The tracker applies the
+	// initial threshold and the backoff so runaway failures don't flood the inbox.
+	if globalFailureTracker.recordFailure(d.Name, d.FailureWarning, d.FailureBackoffCount, d.FailureBackoffInterval, time.Now()) {
+		message := []string{
+			"Contra was unable to gather configs from", d.Name,
+			"after", strconv.Itoa(d.FailureWarning), "consecutive failed attempts.",
+			"last error:", err.Error(),
 		}
+		// Fire off an email. Email failure is logged elsewhere and does not interrupt this process.
+		_ = utils.SendEmail(cw.RunConfig, "Contra failure warning!", strings.Join(message, " "))
 	}
 
 	// log a warning, reminder the matcher could be out of date, or incomplete.
