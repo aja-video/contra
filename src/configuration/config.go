@@ -65,10 +65,13 @@ type DeviceConfig struct {
 	Port       int
 	Ciphers    string
 	Disabled   bool
-	// Channel to track device collection failures
-	FailChan chan bool
-	// Number of failures to trigger an alert. A value of 0 disables alerts
+	// Number of consecutive failed runs before the first alert is sent. A value of 0 disables alerts.
 	FailureWarning int
+	// FailureBackoffCount is the number of alerts sent during a single failure episode before
+	// backoff engages. Once reached, further alerts are rate limited to FailureBackoffInterval.
+	FailureBackoffCount int
+	// FailureBackoffInterval is the minimum spacing between alerts once backoff has engaged.
+	FailureBackoffInterval time.Duration
 	// SSH settings
 	SSHTimeout       time.Duration
 	SSHAuthMethod    string
