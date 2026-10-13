@@ -28,19 +28,17 @@ func mergeConfigFile(config *Config, filePath string) error {
 		}
 
 		deviceConfig := DeviceConfig{
-			FailureWarning:   5,
-			SSHAuthMethod:    "Password",
-			SSHTimeout:       10 * time.Second,
-			AllowInsecureSSH: true,
+			FailureWarning:         5,
+			FailureBackoffCount:    5,
+			FailureBackoffInterval: 24 * time.Hour,
+			SSHAuthMethod:          "Password",
+			SSHTimeout:             10 * time.Second,
+			AllowInsecureSSH:       true,
 		}
 
 		section.MapTo(&deviceConfig)
 		// Copy the section name into the device config for reference.
 		deviceConfig.Name = section.Name()
-		// Set up device failure channel if it isn't disabled (zero value)
-		if deviceConfig.FailureWarning > 0 {
-			deviceConfig.FailChan = make(chan bool, deviceConfig.FailureWarning)
-		}
 		config.Devices = append(config.Devices, deviceConfig)
 	}
 	return nil
