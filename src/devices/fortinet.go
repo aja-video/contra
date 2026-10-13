@@ -33,7 +33,8 @@ func (p *DeviceFortinet) ParseResult(result string) (string, error) {
 	matcher := regexp.MustCompile(`config system global[\s\S]*end`)
 	match := matcher.FindStringSubmatch(result)
 	// redact encrypted passwords as they change every run
-	encryptedPassword := regexp.MustCompile("ENC .*==")
+	// base64 padding varies from zero to two '=', so match the whole whitespace-free value
+	encryptedPassword := regexp.MustCompile(`ENC \S+`)
 	redactedResult := encryptedPassword.ReplaceAllString(match[0], "ENC ~~~Contra Redacted~~~")
 
 	return redactedResult, nil
