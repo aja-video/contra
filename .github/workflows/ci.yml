@@ -26,6 +26,16 @@ jobs:
           # Keep the toolchain in sync with the `go` directive in go.mod.
           go-version-file: go.mod
 
+      - name: Check formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "These files need gofmt:"
+            echo "$unformatted"
+            gofmt -d .
+            exit 1
+          fi
+
       - name: Build
         run: go build -v ./...
 

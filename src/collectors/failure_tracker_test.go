@@ -48,8 +48,8 @@ func TestRecordFailureInitialThreshold(t *testing.T) {
 // alerts are rate limited to one per backoffInterval regardless of failure cadence.
 func TestRecordFailureBackoff(t *testing.T) {
 	tr := newTestTracker()
-	warning := 1        // alert on every failure until backoff
-	backoffCount := 3   // engage backoff after 3 alerts
+	warning := 1      // alert on every failure until backoff
+	backoffCount := 3 // engage backoff after 3 alerts
 	interval := time.Hour
 	base := time.Unix(0, 0)
 
