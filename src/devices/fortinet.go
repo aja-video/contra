@@ -1,6 +1,7 @@
 package devices
 
 import (
+	"fmt"
 	"github.com/aja-video/contra/src/configuration"
 	"github.com/aja-video/contra/src/utils"
 	"github.com/google/goexpect"
@@ -32,6 +33,9 @@ func (p *DeviceFortinet) BuildBatcher() ([]expect.Batcher, error) {
 func (p *DeviceFortinet) ParseResult(result string) (string, error) {
 	matcher := regexp.MustCompile(`config system global[\s\S]*end`)
 	match := matcher.FindStringSubmatch(result)
+	if len(match) == 0 {
+		return "", fmt.Errorf("fortinet configuration match not found")
+	}
 	// redact encrypted passwords as they change every run
 	encryptedPassword := regexp.MustCompile("ENC .*==")
 	redactedResult := encryptedPassword.ReplaceAllString(match[0], "ENC ~~~Contra Redacted~~~")
