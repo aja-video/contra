@@ -34,8 +34,10 @@ func (p *DeviceFortinet) ParseResult(result string) (string, error) {
 	match := matcher.FindStringSubmatch(result)
 	// redact encrypted passwords as they change every run
 	// base64 padding varies from zero to two '=', so match the whole whitespace-free value
-	encryptedPassword := regexp.MustCompile(`ENC \S+`)
-	redactedResult := encryptedPassword.ReplaceAllString(match[0], "ENC ~~~Contra Redacted~~~")
+	// anchor on FortiOS's `set <attribute> ENC <value>` form so "ENC " inside a quoted
+	// object name or comment is left alone
+	encryptedPassword := regexp.MustCompile(`(?m)^([ \t]*set \S+ ENC )\S+`)
+	redactedResult := encryptedPassword.ReplaceAllString(match[0], "${1}~~~Contra Redacted~~~")
 
 	return redactedResult, nil
 }

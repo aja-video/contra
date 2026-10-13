@@ -34,6 +34,16 @@ func TestParseResultFortinet(t *testing.T) {
 			expected: "config system global\n    set api-key ENC ~~~Contra Redacted~~~\n" +
 				"    set comments \"This is the default\"\n    set password ENC ~~~Contra Redacted~~~\nend",
 		},
+		{
+			name:     "ENC inside quoted object name",
+			input:    "config system global\n    edit \"SITE ENC GW\"\n        set password ENC SGVsbG8=\nend",
+			expected: "config system global\n    edit \"SITE ENC GW\"\n        set password ENC ~~~Contra Redacted~~~\nend",
+		},
+		{
+			name:     "ENC inside comment",
+			input:    "config system global\n    set comments \"VPN ENC tunnel\"\n    set member \"FENC 1\"\nend",
+			expected: "config system global\n    set comments \"VPN ENC tunnel\"\n    set member \"FENC 1\"\nend",
+		},
 	}
 
 	for _, tc := range testcases {
