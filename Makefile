@@ -1,4 +1,6 @@
-VERSION=$(shell ./bin/contra -q -version)
+# Derived from the nearest git tag; the release workflow overrides it with the pushed tag.
+VERSION ?= $(shell git describe --tags --always --dirty | sed 's/^v//')
+LDFLAGS=-s -w -X github.com/aja-video/contra/src/core.version=$(VERSION)
 BINARY=contra
 RPMDIR=rpm
 DEBDIR=deb
@@ -8,7 +10,7 @@ binaries: staging clean linux64
 
 linux64:
 	@echo -----linux64-----
-	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/$(BINARY) contra.go
+	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o bin/$(BINARY) contra.go
 
 release: binaries compress rpm64 deb64
 

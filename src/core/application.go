@@ -11,7 +11,8 @@ import (
 	"time"
 )
 
-const version = "1.0.53"
+// version is set at build time from the git tag; see the Makefile and the release workflow.
+var version = "dev"
 
 // Application holds global application data and functions for kicking off execution.
 type Application struct {

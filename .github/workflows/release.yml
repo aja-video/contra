@@ -1,0 +1,45 @@
+name: Release
+
+# Pushing a v* tag builds the compressed binary and the rpm/deb packages and
+# attaches them to the GitHub release for that tag, creating the release if needed.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: go test ./...
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby ruby-dev rpm upx-ucl
+          sudo gem install --no-document fpm
+
+      - name: Build binary and packages
+        run: make release VERSION="${GITHUB_REF_NAME#v}"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" bin/contra bin/*.rpm bin/*.deb --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" bin/contra bin/*.rpm bin/*.deb --generate-notes --verify-tag
+          fi
