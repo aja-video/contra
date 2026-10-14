@@ -97,6 +97,16 @@ Pass="""Some#pass;word"""
 
 After the initial build, `make run` or `make` then execute `./bin/contra`
 
+The version reported by `contra -version` comes from `git describe` at build time. A plain `go build` reports `dev`.
+
+#### Releasing
+Push a version tag and the [Release workflow](.github/workflows/release.yml) builds the binary and packages and attaches them to the GitHub release:
+
+```sh
+git tag v1.0.54
+git push origin v1.0.54
+```
+
 #### Dependency Management
 * [Go 1.11 modules](https://github.com/golang/go/wiki/Modules) are used to manage dependencies
 
