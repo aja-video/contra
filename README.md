@@ -64,13 +64,18 @@ the application. Using the `-configtest` flag will exit even if the checks pass.
 * HP/Comware
     * For locked down devices use UnlockPass in the device configuration to unlock xtd-cli-mode
 * Arista
-* Mikrotrik
+* Mikrotik
+* Ubiquiti EdgeSwitch
+* Fortinet (FortiGate)
+    * Encrypted `ENC` values are redacted, since FortiOS re-encrypts them on every `show`
+* Netgear (M4500)
+* AWS Route53 (resource record sets for a hosted zone)
+* HTTP JSON (any endpoint returning a JSON config, stored pretty-printed)
 
 ### Someday
 
 * Cisco
 * Juniper (JunOS)
-* http
 * custom scripting
 
 ## Device Configuration
